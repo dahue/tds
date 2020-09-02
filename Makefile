@@ -6,43 +6,29 @@
 #
 .PHONY: all syntactic_analyzer lexical_analyzer clean
 
-CC = gcc
-LEXA = flex
-SYNA = bison
+CC 		= gcc
+LEXA 	= flex
+SYNA 	= bison
 
-# SRCS := $(wildcard *.c)
-# BINS := $(SRCS:%.c=%)
+OUTPUT_BIN = tdsc
 
-# SUBDIRS = \
-# 	00_lexical_analysis \
-# 	01_syntactic_analysis \
-# 	src \
-# 	doc \
-# 	tests
+SRCDIR = src
 
-all: tdsc
-
-tdsc: syntactic_analyzer
-	${CC} src/syntactic_analyzer.c src/lexical_analyzer.c -o tdsc
+all: syntactic_analyzer
+	@echo "Building tdsc"
+	${CC} ${SRCDIR}/syntactic_analyzer.c ${SRCDIR}/lexical_analyzer.c -o ${OUTPUT_BIN}
 
 syntactic_analyzer: lexical_analyzer
 	@echo "Compiling syntactic analyzer"
-	${SYNA} -d -o src/syntactic_analyzer.c src/01_syntactic_analyzer.y
+	${SYNA} -d -o ${SRCDIR}/$@.c ${SRCDIR}/01_$@.y
 
-lexical_analyzer:
+lexical_analyzer: 
 	@echo "Compiling lexical analyzer"
-	${LEXA} -o src/lexical_analyzer.c src/00_lexical_analyzer.l
-
-# say_hello:
-# 	@echo "Hello World"
-
-# generate:
-# 	@echo "Creating empty text files..."
-# 	touch file-{1..10}.txt
+	${LEXA} -o ${SRCDIR}/$@.c ${SRCDIR}/00_$@.l
 
 clean:
 	@echo "Cleaning up..."
-	rm tdsc
-	rm src/*.c 
-	rm src/*.h
+	rm ${OUTPUT_BIN}
+	rm ${SRCDIR}/*.c 
+	rm ${SRCDIR}/*.h
 
