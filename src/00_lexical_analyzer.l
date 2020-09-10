@@ -1,35 +1,53 @@
 %{
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
 #include "syntactic_analyzer.h"
-
 %}
 
 %option noyywrap
 %option yylineno
 
-letra [a-zA-z]
-digito [0-9]
+var_decl ("var"|"VAR")
+assign_op =
+letter [a-zA-z]
+digit [0-9]
+ident {letter}({letter}|{digit})*
 
 %%
+{var_decl}						{
+									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+									strcpy(yylval.s,yytext);
+									printf("VAR_DECL : %s\n",yytext);
+									return VAR_DECL;
+								}
 
-{digito}+                     { yylval.i = atoi(yytext);
-                                printf("INT : %d\n",atoi(yytext)); 
-                                return INT;}
+{assign_op}						{
+									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+									strcpy(yylval.s,yytext);
+									printf("ASSIGN_OP : %s\n",yytext);
+									return ASSIGN_OP;
+								}
 
-{letra}({letra}|{digito})*    { yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-                                strcpy(yylval.s,yytext);
-                                printf("ID : %s\n",yytext);
-                                return ID;}
+{digit}+                     	{ 
+									yylval.i = atoi(yytext);
+									printf("INT : %d\n",atoi(yytext)); 
+									return INT;
+								}
 
-[+*;()]                   {  printf("%s\n",yytext);
-                                  return *yytext;}
+{ident}					    	{ 
+									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+									strcpy(yylval.s,yytext);
+									printf("ID : %s\n",yytext);
+									return ID;
+								}
 
-.|\n                          ; /* ignore all the rest */
+[+*;()]							{  
+									printf("%s\n",yytext);
+                                	return *yytext;
+								}
 
+.|\n                          	; /* ignore all the rest */
 %%
 
 void yyerror(){
@@ -42,7 +60,5 @@ int main(int argc,char *argv[]){
 		yyin = fopen(argv[0],"r");
 	else
 		yyin = stdin;
-
 	yyparse();
-
 }
