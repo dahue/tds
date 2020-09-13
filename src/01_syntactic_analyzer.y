@@ -31,7 +31,8 @@ void yyerror();
  
 prog: 
   declaracion expr ';'          { 
-                                  printf("%s%d\n", "Resultado: ", evalPostorder($2)->dataINT);
+                                  printf("%s%d\n\n", "Resultado: ", evalPostorder($2)->dataINT);
+                                  printf("PSEUDO-ASSEMBLER\n");
                                   assemblerGen($2);
                                 }
   ;
@@ -70,11 +71,11 @@ expr:
                       }
   | expr '+' expr     { // $$ = $1 + $3; 
                         $$ = newNodeSTR("+", $1, $3);
-                        printf("%s%s\n","Operador Suma: ", $$->dataSTR);
+                        // printf("%s%s\n","Operador Suma: ", $$->dataSTR);
                       }
   | expr '*' expr     { // $$ = $1 * $3;
                         $$ = newNodeSTR("*", $1, $3);
-                        printf("%s%s\n","Operador Producto: ", $$->dataSTR);
+                        // printf("%s%s\n","Operador Producto: ", $$->dataSTR);
                       }
   | '(' expr ')'      { $$ =  $2; }
   ;

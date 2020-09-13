@@ -47,13 +47,13 @@ struct node* assemblerGen(struct node* node)
     struct node *b;
 
     if ((node->left == NULL) || (node->right == NULL)){
-        printf("MOV %d AUX\n", node->dataINT);
+        printf("MOV %d EAX\n", node->dataINT);
         return node;
     }
   
     // first recur on left subtree 
     a = assemblerGen(node->left);
-    printf("MOV AUX EAX\n");
+    printf("MOV EAX AUX\n");
     // then recur on right subtree 
     b = assemblerGen(node->right); 
     // printf("MOV %d AUX\n", b->dataINT);
@@ -62,14 +62,14 @@ struct node* assemblerGen(struct node* node)
     if (node->dataSTR == "+"){
         // printf("MOV %d EAX\n", a->dataINT);
         printf("ADD AUX EAX\n");
-        printf("MOV EAX AUX\n");
+        // printf("MOV EAX AUX\n");
         node->dataINT = a->dataINT + b->dataINT;
         return node;
     }
     else{
         // printf("MOV %d EAX\n", a->dataINT);
         printf("MUL AUX EAX\n");
-        printf("MOV EAX AUX\n");
+        // printf("MOV EAX AUX\n");
         node->dataINT = a->dataINT * b->dataINT;
         return node;
     }
