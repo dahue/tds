@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "TS.c"
-#include "binary_tree.c"
+#include "ast.c"
 
 int yylex();
 void yyerror();
@@ -22,7 +22,7 @@ void yyerror();
 %token ASSIGN_OP
 %token EOS
 
-%type<i> expr
+%type<n> expr
  
 %left '+' 
 %left '*'
@@ -30,7 +30,10 @@ void yyerror();
 %%
  
 prog: 
-  declaracion expr ';'          { printf("%s%d\n", "Resultado: ",$2); }
+  declaracion expr ';'          { 
+                                  printf("%s%d\n", "Resultado: ", evalPostorder($2)->dataINT);
+                                  assemblerGen($2);
+                                }
   ;
 
 // declaraciones: 
@@ -52,24 +55,28 @@ declaracion:
 
 expr:
   ID                  { 
-                        if (existe($1)==1) $$ = buscar_valor($1);
+                        if (existe($1)==1){
+                          $$ = newNodeINT(buscar_valor($1), NULL, NULL);
+                        }
                         else{
                           printf("%s%s\n", "Variable no declarada :",$1);
-                          $$ = 0;
+                          $$ = newNodeINT(0, NULL, NULL);
                         }
                       }
   | INT               { // $$ = $1;
-                        $$ = $1;
-                        printf("%s%d\n","Constante entera:",$1);
-                      }              
-  | expr '+' expr     { $$ = $1 + $3; 
-                        // printf("%s,%d,%d,%d\n","Operador Suma\n",$1,$3,$1+$3);
+                        $$ = newNodeINT($1, NULL, NULL);
+                        printf("%s%d\n","Constante entera:", $$->dataINT);
+                        printf("%s%s\n","Tipo:",$$->type);
                       }
-  | expr '*' expr     { $$ = $1 * $3; 
-                        // printf("%s,%d,%d,%d\n","Operador Producto\n",$1,$3,$1*$3);  
+  | expr '+' expr     { // $$ = $1 + $3; 
+                        $$ = newNodeSTR("+", $1, $3);
+                        printf("%s%s\n","Operador Suma: ", $$->dataSTR);
                       }
-  | '(' expr ')'      { $$ =  $2; 
+  | expr '*' expr     { // $$ = $1 * $3;
+                        $$ = newNodeSTR("*", $1, $3);
+                        printf("%s%s\n","Operador Producto: ", $$->dataSTR);
                       }
+  | '(' expr ')'      { $$ =  $2; }
   ;
  
 %%
