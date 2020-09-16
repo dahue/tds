@@ -1,13 +1,11 @@
 %{
-
-#include <stdlib.h>
-#include <stdio.h>
 #include "TS.c"
 #include "ast.c"
 
 int yylex();
 void yyerror();
 
+struct node *tree;
 %}
  
 %union { 
@@ -31,9 +29,7 @@ void yyerror();
  
 prog: 
   declaracion expr ';'          { 
-                                  printf("%s%d\n\n", "Resultado: ", evalPostorder($2)->dataINT);
-                                  printf("PSEUDO-ASSEMBLER\n");
-                                  assemblerGen($2);
+                                  tree = $2;
                                 }
   ;
 
@@ -51,7 +47,6 @@ declaracion:
   ;
 
 // asignacion:
-
 //   ;
 
 expr:
@@ -82,4 +77,6 @@ expr:
  
 %%
 
-
+struct node *returnAST(){
+  return tree;
+}

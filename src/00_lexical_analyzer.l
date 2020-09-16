@@ -1,7 +1,4 @@
 %{
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "syntactic_analyzer.h"
 %}
 
@@ -52,13 +49,4 @@ ident {letter}({letter}|{digit})*
 
 void yyerror(){
 	printf("%s%d\n","-> ERROR Sintactico en la linea: ",yylineno);
-}
-
-int main(int argc,char *argv[]){
-	++argv,--argc;
-	if (argc > 0)
-		yyin = fopen(argv[0],"r");
-	else
-		yyin = stdin;
-	yyparse();
 }

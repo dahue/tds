@@ -32,7 +32,7 @@ all: tdsc
 
 tdsc: syntactic_analyzer
 	@echo "Building tdsc"
-	${CC} ${SRCDIR}/syntactic_analyzer.c ${SRCDIR}/lexical_analyzer.c -o $@
+	${CC} ${SRCDIR}/lexical_analyzer.c ${SRCDIR}/main.c -o $@
 
 syntactic_analyzer: lexical_analyzer
 	@echo "Compiling syntactic analyzer"

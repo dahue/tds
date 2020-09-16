@@ -1,3 +1,5 @@
+// #ifndef AST_HEADER
+// #define AST_HEADER
 #include<stdio.h> 
 #include<stdlib.h>
 
@@ -75,7 +77,7 @@ struct node* assemblerGen(struct node* node)
     }
 }
 
-struct node* evalPostorder(struct node* node) 
+struct node* evalPostorder(struct node* node)
 { 
     struct node *a;
     struct node *b;
@@ -112,47 +114,4 @@ struct node* evalPostorder(struct node* node)
     //     // printf("%d ", 1); 
     // }   
 }
-
-// void printPostorder(struct node* node) 
-// { 
-//     if (node == NULL) 
-//         return; 
-  
-//     // first recur on left subtree 
-//     printPostorder(node->left); 
-  
-//     // then recur on right subtree 
-//     printPostorder(node->right); 
-  
-//     // now deal with the node
-//     if (node->type == "int"){
-//         printf("%d ", *((int *)node->data)); 
-//         // printf("%d ", 0); 
-//     }
-//     else{
-//         printf("%s ", ((char *)node->data)); 
-//         // printf("%d ", 1); 
-//     }   
-// }
-
-// void printInorder(struct node* node) 
-// { 
-//     if (node == NULL) 
-//         return; 
-  
-//     /* first recur on left child */
-//     printInorder(node->left); 
-  
-//     /* then print the data of node */
-//     if (node->type == "int"){
-//         printf("%d ", *((int *)node->data)); 
-//         // printf("%d ", 0); 
-//     }
-//     else{
-//         printf("%s ", *((char **)node->data)); 
-//         // printf("%d ", 1); 
-//     }
-    
-//     /* now recur on right child */
-//     printInorder(node->right); 
-// } 
+// #endif
