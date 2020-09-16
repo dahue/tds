@@ -1,6 +1,6 @@
 %{
-#include "TS.c"
-#include "ast.c"
+#include "util/TS.c"
+#include "util/ast.c"
 
 int yylex();
 void yyerror();
@@ -18,7 +18,6 @@ struct node *tree;
 %token<s> ID
 %token VAR_DECL
 %token ASSIGN_OP
-%token EOS
 
 %type<n> expr
  
@@ -33,11 +32,6 @@ prog:
                                 }
   ;
 
-// declaraciones: 
-//   declaracion
-//   | declaracion declaraciones
-//   ;
-
 declaracion:
   VAR_DECL ID ASSIGN_OP INT ';' declaracion { 
                                               if (existe($2)==0) insertar($2, $4);
@@ -45,9 +39,6 @@ declaracion:
                                             }
   |
   ;
-
-// asignacion:
-//   ;
 
 expr:
   ID                  { 
@@ -62,15 +53,12 @@ expr:
   | INT               { // $$ = $1;
                         $$ = newNodeINT($1, NULL, NULL);
                         printf("%s%d\n","Constante entera:", $$->dataINT);
-                        printf("%s%s\n","Tipo:",$$->type);
                       }
-  | expr '+' expr     { // $$ = $1 + $3; 
+  | expr '+' expr     {
                         $$ = newNodeSTR("+", $1, $3);
-                        // printf("%s%s\n","Operador Suma: ", $$->dataSTR);
                       }
-  | expr '*' expr     { // $$ = $1 * $3;
+  | expr '*' expr     {
                         $$ = newNodeSTR("*", $1, $3);
-                        // printf("%s%s\n","Operador Producto: ", $$->dataSTR);
                       }
   | '(' expr ')'      { $$ =  $2; }
   ;
