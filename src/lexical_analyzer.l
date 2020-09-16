@@ -10,8 +10,15 @@ assign_op =
 letter [a-zA-z]
 digit [0-9]
 ident {letter}({letter}|{digit})*
+comment ("#").*
 
 %%
+{comment}					    { 
+									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+									strcpy(yylval.s,yytext);
+									printf("COMMENT : %s\n",yytext);
+								}
+
 {var_decl}						{
 									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
 									strcpy(yylval.s,yytext);

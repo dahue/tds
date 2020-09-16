@@ -1,1 +1,2 @@
+# Este test falla. La variable x no esta inicializada, por lo tanto no se puede evaluar la expresion
 var x; var y = 1; x+2+y;

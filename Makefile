@@ -32,15 +32,16 @@ all: tdsc
 
 tdsc: syntactic_analyzer
 	@echo "Building tdsc"
-	${CC} ${SRCDIR}/lexical_analyzer.c ${SRCDIR}/main.c -o $@
+	mkdir -p bin/
+	${CC} ${SRCDIR}/lexical_analyzer.c ${SRCDIR}/main.c -o bin/$@
 
 syntactic_analyzer: lexical_analyzer
 	@echo "Compiling syntactic analyzer"
-	${SYNA} -d -o ${SRCDIR}/$@.c ${SRCDIR}/01_$@.y
+	${SYNA} -d -o ${SRCDIR}/$@.c ${SRCDIR}/$@.y
 
 lexical_analyzer: 
 	@echo "Compiling lexical analyzer"
-	${LEXA} -o ${SRCDIR}/$@.c ${SRCDIR}/00_$@.l
+	${LEXA} -o ${SRCDIR}/$@.c ${SRCDIR}/$@.l
 
 clean:
 	@echo "Cleaning up..."
@@ -54,5 +55,4 @@ clean:
 	rm -f ${SRCDIR}/lexical_analyzer.o ${SRCDIR}/syntactic_analyzer.o
 
 	# Delete executable file
-	rm -f tdsc
-
+	rm -rf bin/
