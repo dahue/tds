@@ -1,0 +1,12 @@
+# Folders with random stuff
+delete/
+
+# Auto-generated .c files
+lexical_analyzer.c
+syntactic_analyzer.c
+
+# Auto-generated .h files
+syntactic_analyzer.h
+
+# Executable file
+tdsc

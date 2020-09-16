@@ -1,0 +1,2 @@
+# Este test falla. una variable no puede ser declarada despues de evaluar una expresion.
+var x = 2; x*1; var y = 1; x+2+y;

@@ -1,0 +1,2 @@
+# Este test debe retornar 100
+var x = 10;var y = 2;x * (y + 4) * 0 + 100;
