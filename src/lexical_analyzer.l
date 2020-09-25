@@ -4,6 +4,7 @@
 
 %option noyywrap
 %option yylineno
+%x C_COMMENT
 
 integer 	("integer")
 bool 		("bool")
@@ -21,29 +22,20 @@ digit 		[0-9]
 alpha_num 	({alpha}|{digit}|"_")
 id	 		{alpha}({alpha_num})*
 l_comment 	("//").*
-sb_comment	("/*")
-eb_comment	("*/")
 comma 		(",")
 semicolon	(";")
 
 
 %%
+"/*"            				{ BEGIN(C_COMMENT); }
+<C_COMMENT>"*/" 				{ BEGIN(INITIAL); }
+<C_COMMENT>.    				{ }
+<C_COMMENT>\n   				{ }
+
 {l_comment}					    { 
 									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
 									strcpy(yylval.s,yytext);
 									printf("L_COMMENT : %s\n",yytext);
-								}
-
-{sb_comment}					{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("SB_COMMENT : %s\n",yytext);
-								}
-
-{eb_comment}					{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("EB_COMMENT : %s\n",yytext);
 								}
 
 {integer}						{ 
@@ -99,14 +91,14 @@ semicolon	(";")
 									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
 									strcpy(yylval.s,yytext);
 									printf("EQUAL : %s\n",yytext);
-									// return EQUAL;
+									return EQUAL;
 								}
 
 {and}							{
 									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
 									strcpy(yylval.s,yytext);
 									printf("AND : %s\n",yytext);
-									// return AND;
+									return AND;
 								}
 
 {assign_op}						{
@@ -143,12 +135,12 @@ semicolon	(";")
 									return SEMICOLON;
 								}
 
-[+*;(){}!]							{  
+[+*;()\[\]{}!]							{  
 									printf("%s\n",yytext);
                                 	return *yytext;
 								}
 
-(\n|" "|\t)                        /* ignore all the rest */
+(\r\n|" "|\t)                        /* ignore all the rest */
 
 .									{printf("Error! %s\n",yytext);}
 %%

@@ -21,8 +21,8 @@ void yyerror();
 %token VOID
 
 
-// %token EQUAL
-// %token AND
+%token EQUAL
+%token AND
 %token ASSIGN_OP
 %token COMMA
 %token SEMICOLON
@@ -31,6 +31,9 @@ void yyerror();
  
 %left '+' 
 %left '*'
+%left '!'
+%left AND
+%left EQUAL
  
 %%
  
@@ -98,6 +101,18 @@ statement:
   | block
   ;
 
+expression:
+    ID
+  | literal
+  | '!' expression
+  | expression AND expression
+  | expression EQUAL expression
+  | expression '+' expression
+  | expression '*' expression
+  // | expression arith_op expression
+  | '(' expression ')'
+  ;
+
 literal:
     integer_literal
   | bool_literal
@@ -129,15 +144,6 @@ integer_literal:
 bool_literal:
     TRUE
   | FALSE
-  ;
-
-expression:
-    ID
-  | literal         
-  | expression '+' expression
-  | expression '*' expression
-  // | '!' expression
-  | '(' expression ')'
   ;
  
 %%

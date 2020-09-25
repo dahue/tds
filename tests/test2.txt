@@ -2,7 +2,9 @@ integer inc(integer x){
     return x + 1;
 }
 extern integer get_int();
+
 extern void print_int(integer i);
+
 integer main(){
     integer y;
     y = 1;
