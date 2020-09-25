@@ -2,6 +2,7 @@
 Este es un comentario de bloque
 */
 integer variable;
+integer a;
 
 //definicion funcion
 integer inc(integer x){
@@ -10,7 +11,7 @@ integer inc(integer x){
 
 // definicion procedimiento
 void inc_void(){
-    x + 1;
+    x + 1;+
 }
 
 // definicion de funcion externa

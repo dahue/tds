@@ -56,3 +56,6 @@ clean:
 
 	# Delete executable file
 	rm -rf bin/
+
+	# Delete random files
+	rm -f ${SRCDIR}/syntactic_analyzer.output

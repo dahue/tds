@@ -27,13 +27,12 @@ void yyerror();
 %token COMMA
 %token SEMICOLON
 
-// %type<s> expression
- 
+%left AND
+%nonassoc EQUAL
 %left '+' 
 %left '*'
 %left '!'
-%left AND
-%left EQUAL
+
  
 %%
  
@@ -109,7 +108,6 @@ expression:
   | expression EQUAL expression
   | expression '+' expression
   | expression '*' expression
-  // | expression arith_op expression
   | '(' expression ')'
   ;
 
@@ -117,25 +115,6 @@ literal:
     integer_literal
   | bool_literal
   ;
-
-// bin_op:
-//     arith_op
-//   | rel_op
-//   | cond_op
-//   ;
-
-// arith_op:
-//     '+'
-//   | '*'
-//   ;
-
-// rel_op:
-//     EQUAL
-//   ;
-
-// cond_op:
-//     AND
-//   ;
 
 integer_literal:
     INT
