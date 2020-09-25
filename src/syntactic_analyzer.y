@@ -93,6 +93,7 @@ statement_list:
 statement:
     ID ASSIGN_OP expression SEMICOLON
   | RETURN expression SEMICOLON
+  | expression SEMICOLON
   | SEMICOLON
   | block
   ;
