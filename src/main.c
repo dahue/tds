@@ -11,9 +11,4 @@ int main(int argc,char *argv[]){
 	else
 		yyin = stdin;
 	yyparse();
-
-    struct node *tree = returnAST();
-    printf("%s%d\n\n", "Resultado: ", evalPostorder(tree)->dataINT);
-    printf("PSEUDO-ASSEMBLER\n");
-    assemblerGen(tree);
 }

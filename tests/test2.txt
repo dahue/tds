@@ -1,2 +1,15 @@
-# Este test debe retornar 100
-var x = 10;var y = 2;x * (y + 4) * 0 + 100;
+integer inc(integer x){
+    return x + 1;
+}
+extern integer get_int();
+extern void print_int(integer i);
+integer main(){
+    integer y;
+    y = 1;
+    {
+        integer x;
+        x = 2;
+        y = x + 1;
+    }
+    return x;
+}

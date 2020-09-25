@@ -37,7 +37,7 @@ tdsc: syntactic_analyzer
 
 syntactic_analyzer: lexical_analyzer
 	@echo "Compiling syntactic analyzer"
-	${SYNA} -d -o ${SRCDIR}/$@.c ${SRCDIR}/$@.y
+	${SYNA} -v -d -o ${SRCDIR}/$@.c ${SRCDIR}/$@.y
 
 lexical_analyzer: 
 	@echo "Compiling lexical analyzer"
