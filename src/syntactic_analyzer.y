@@ -4,7 +4,8 @@ int yylex();
 void yyerror();
 
 %}
- 
+
+%locations
 %union { 
   int i; 
   char *s;
@@ -12,6 +13,7 @@ void yyerror();
  
 %token<i> INT
 %token<s> ID
+
 %token INTEGER
 %token BOOL
 %token FALSE
@@ -19,8 +21,6 @@ void yyerror();
 %token EXTERN
 %token RETURN
 %token VOID
-
-
 %token EQUAL
 %token AND
 %token ASSIGN_OP

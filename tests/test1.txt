@@ -11,7 +11,7 @@ integer inc(integer x){
 
 // definicion procedimiento
 void inc_void(){
-    x + 1;+
+    x + 1;
 }
 
 // definicion de funcion externa

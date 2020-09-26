@@ -1,19 +1,19 @@
 %{
 #include "syntactic_analyzer.h"
+#include "util/verbose.c"
 %}
 
 %option noyywrap
 %option yylineno
 %x C_COMMENT
 
-integer 	("integer")
-bool 		("bool")
-false 		("false")
-true 		("true")
-extern 		("extern")
-return 		("return")
-void		("void")
-
+integer     ("integer")
+bool        ("bool")
+false       ("false")
+true        ("true")
+extern      ("extern")
+return      ("return")
+void        ("void")
 and			("&&")
 equal		("==")
 assign_op 	("=")
@@ -27,124 +27,132 @@ semicolon	(";")
 
 
 %%
-"/*"            				{ BEGIN(C_COMMENT); }
-<C_COMMENT>"*/" 				{ BEGIN(INITIAL); }
-<C_COMMENT>.    				{ }
-<C_COMMENT>\n   				{ }
 
-{l_comment}					    { 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("L_COMMENT : %s\n",yytext);
-								}
+"/*" {
+    BEGIN(C_COMMENT); 
+}
+<C_COMMENT>"*/" { 
+    BEGIN(INITIAL);
+}
+<C_COMMENT>.
+<C_COMMENT>\n
+
+{l_comment} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("L_COMMENT : %s\n",yytext);
+}
 
 {integer}						{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("INTEGER : %s\n",yytext);
-									return INTEGER;
-								}
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("INTEGER : %s\n",yytext);
+    return INTEGER;
+}
 
-{bool}							{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("BOOL : %s\n",yytext);
-									return BOOL;
-								}
+{bool} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("BOOL : %s\n",yytext);
+    return BOOL;
+}
 
-{false}							{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("FALSE : %s\n",yytext);
-									return FALSE;
-								}
+{false}	{ 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("FALSE : %s\n",yytext);
+    return FALSE;
+}
 
-{true}							{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("TRUE : %s\n",yytext);
-									return TRUE;
-								}
+{true} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("TRUE : %s\n",yytext);
+    return TRUE;
+}
 
-{extern}						{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("EXTERN : %s\n",yytext);
-									return EXTERN;
-								}
+{extern} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("EXTERN : %s\n",yytext);
+    return EXTERN;
+}
 
-{return}						{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("RETURN : %s\n",yytext);
-									return RETURN;
-								}
+{return} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("RETURN : %s\n",yytext);
+    return RETURN;
+}
 
-{void}							{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("VOID : %s\n",yytext);
-									return VOID;
-								}
+{void} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("VOID : %s\n",yytext);
+    return VOID;
+}
 
-{equal}							{
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("EQUAL : %s\n",yytext);
-									return EQUAL;
-								}
+{equal} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("EQUAL : %s\n",yytext);
+    return EQUAL;
+}
 
-{and}							{
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("AND : %s\n",yytext);
-									return AND;
-								}
+{and} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("AND : %s\n",yytext);
+    return AND;
+}
 
-{assign_op}						{
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("ASSIGN_OP : %s\n",yytext);
-									return ASSIGN_OP;
-								}
+{assign_op} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("ASSIGN_OP : %s\n",yytext);
+    return ASSIGN_OP;
+}
 
-{digit}+                     	{ 
-									yylval.i = atoi(yytext);
-									printf("INT : %d\n",atoi(yytext)); 
-									return INT;
-								}
+{digit}+ { 
+    yylval.i = atoi(yytext);
+    verbose("INT : %d\n",atoi(yytext)); 
+    return INT;
+}
 
-{id}					    	{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("ID : %s\n",yytext);
-									return ID;
-								}
+{id} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("ID : %s\n",yytext);
+    return ID;
+}
 
-{comma}					    	{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("COMMA : %s\n",yytext);
-									return COMMA;
-								}
+{comma} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("COMMA : %s\n",yytext);
+    return COMMA;
+}
 
-{semicolon}					    	{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("SEMICOLON : %s\n",yytext);
-									return SEMICOLON;
-								}
+{semicolon} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("SEMICOLON : %s\n",yytext);
+    return SEMICOLON;
+}
 
-[+*;()\[\]{}!]							{  
-									printf("%s\n",yytext);
-                                	return *yytext;
-								}
+[+*;()\[\]{}!] {  
+    verbose("%s\n",yytext);
+    return *yytext;
+}
 
-(\r\n|" "|\t)                        /* ignore all the rest */
+(\n|\r\n|" "|\t) /* ignore all the rest */
 
-.									{printf("Error! %s\n",yytext);}
+. {
+    printf("tdsc> lexical error: '%s' in line %d.\n", yytext, yylineno);
+}
+
 %%
 
-void yyerror(){
-	printf("%s%d\n","-> ERROR Sintactico en la linea: ",yylineno);
+void yyerror (char *msg) {
+  printf("tdsc> %s: '%s' in line %d.\n", msg, yytext, yylineno);
 }
