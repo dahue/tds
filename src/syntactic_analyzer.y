@@ -1,70 +1,128 @@
 %{
-#include "util/TS.c"
-#include "util/ast.c"
 
 int yylex();
 void yyerror();
 
-struct node *tree;
 %}
- 
+
+%locations
 %union { 
   int i; 
-  char *s; 
-  struct node *n;
+  char *s;
 }
  
 %token<i> INT
 %token<s> ID
-%token VAR_DECL
-%token ASSIGN_OP
 
-%type<n> expr
- 
+%token INTEGER
+%token BOOL
+%token FALSE
+%token TRUE
+%token EXTERN
+%token RETURN
+%token VOID
+%token EQUAL
+%token AND
+%token ASSIGN_OP
+%token COMMA
+%token SEMICOLON
+
+%left AND
+%nonassoc EQUAL
 %left '+' 
 %left '*'
+%left '!'
+
  
 %%
  
-prog: 
-  declaracion expr ';'          { 
-                                  tree = $2;
-                                }
-  ;
-
-declaracion:
-  VAR_DECL ID ASSIGN_OP INT ';' declaracion { 
-                                              if (existe($2)==0) insertar($2, $4);
-                                              else  printf("%s%s\n", "Variable redeclarada :",$2);
-                                            }
+program: 
+    var_decl_list
+  | method_decl_list
+  | var_decl_list method_decl_list
   |
   ;
 
-expr:
-  ID                  { 
-                        if (existe($1)==1){
-                          $$ = newNodeINT(buscar_valor($1), NULL, NULL);
-                        }
-                        else{
-                          printf("%s%s\n", "Variable no declarada :",$1);
-                          $$ = newNodeINT(0, NULL, NULL);
-                        }
-                      }
-  | INT               { // $$ = $1;
-                        $$ = newNodeINT($1, NULL, NULL);
-                        printf("%s%d\n","Constante entera:", $$->dataINT);
-                      }
-  | expr '+' expr     {
-                        $$ = newNodeSTR("+", $1, $3);
-                      }
-  | expr '*' expr     {
-                        $$ = newNodeSTR("*", $1, $3);
-                      }
-  | '(' expr ')'      { $$ =  $2; }
+var_decl_list:
+    var_decl
+  | var_decl_list var_decl
+  ;
+
+var_decl:
+    type var_list SEMICOLON
+  ;
+
+var_list:
+    ID
+  | var_list COMMA ID
+  ;
+
+type:
+    INTEGER
+  | BOOL
+  ;
+
+method_decl_list:
+    method_decl
+  | method_decl_list method_decl
+  ;
+
+method_decl:
+    type ID '(' method_decl_params ')' block
+  | VOID ID '(' method_decl_params ')' block
+  | EXTERN type ID '(' method_decl_params ')' SEMICOLON
+  | EXTERN VOID ID '(' method_decl_params ')' SEMICOLON
+  ;
+
+method_decl_params:
+    type ID
+  | type ID COMMA method_decl_params
+  |
+  ;
+
+block:
+    '{' '}'
+  | '{' var_decl_list '}'
+  | '{' statement_list '}'
+  | '{' var_decl_list statement_list '}'
+  ;
+
+statement_list:
+    statement
+  | statement_list statement
+  ;
+
+statement:
+    ID ASSIGN_OP expression SEMICOLON
+  | RETURN expression SEMICOLON
+  | expression SEMICOLON
+  | SEMICOLON
+  | block
+  ;
+
+expression:
+    ID
+  | literal
+  | '!' expression
+  | expression AND expression
+  | expression EQUAL expression
+  | expression '+' expression
+  | expression '*' expression
+  | '(' expression ')'
+  ;
+
+literal:
+    integer_literal
+  | bool_literal
+  ;
+
+integer_literal:
+    INT
+  ;
+
+bool_literal:
+    TRUE
+  | FALSE
   ;
  
 %%
-
-struct node *returnAST(){
-  return tree;
-}

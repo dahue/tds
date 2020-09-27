@@ -1,6 +1,7 @@
 # Folders with random stuff
 delete/
-
+*.py
+*.output
 # Auto-generated .c files
 lexical_analyzer.c
 syntactic_analyzer.c

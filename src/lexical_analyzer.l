@@ -1,59 +1,158 @@
 %{
 #include "syntactic_analyzer.h"
+#include "util/verbose.c"
 %}
 
 %option noyywrap
 %option yylineno
+%x C_COMMENT
 
-var_decl ("var"|"VAR")
-assign_op =
-letter [a-zA-z]
-digit [0-9]
-ident {letter}({letter}|{digit})*
-comment ("#").*
+integer     ("integer")
+bool        ("bool")
+false       ("false")
+true        ("true")
+extern      ("extern")
+return      ("return")
+void        ("void")
+and			("&&")
+equal		("==")
+assign_op 	("=")
+alpha 		[a-zA-Z]
+digit 		[0-9]
+alpha_num 	({alpha}|{digit}|"_")
+id	 		{alpha}({alpha_num})*
+l_comment 	("//").*
+comma 		(",")
+semicolon	(";")
+
 
 %%
-{comment}					    { 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("COMMENT : %s\n",yytext);
-								}
 
-{var_decl}						{
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("VAR_DECL : %s\n",yytext);
-									return VAR_DECL;
-								}
+"/*" {
+    BEGIN(C_COMMENT); 
+}
+<C_COMMENT>"*/" { 
+    BEGIN(INITIAL);
+}
+<C_COMMENT>.
+<C_COMMENT>\n
 
-{assign_op}						{
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("ASSIGN_OP : %s\n",yytext);
-									return ASSIGN_OP;
-								}
+{l_comment} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("L_COMMENT : %s\n",yytext);
+}
 
-{digit}+                     	{ 
-									yylval.i = atoi(yytext);
-									printf("INT : %d\n",atoi(yytext)); 
-									return INT;
-								}
+{integer}						{ 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("INTEGER : %s\n",yytext);
+    return INTEGER;
+}
 
-{ident}					    	{ 
-									yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
-									strcpy(yylval.s,yytext);
-									printf("ID : %s\n",yytext);
-									return ID;
-								}
+{bool} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("BOOL : %s\n",yytext);
+    return BOOL;
+}
 
-[+*;()]							{  
-									printf("%s\n",yytext);
-                                	return *yytext;
-								}
+{false}	{ 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("FALSE : %s\n",yytext);
+    return FALSE;
+}
 
-.|\n                          	; /* ignore all the rest */
+{true} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("TRUE : %s\n",yytext);
+    return TRUE;
+}
+
+{extern} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("EXTERN : %s\n",yytext);
+    return EXTERN;
+}
+
+{return} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("RETURN : %s\n",yytext);
+    return RETURN;
+}
+
+{void} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("VOID : %s\n",yytext);
+    return VOID;
+}
+
+{equal} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("EQUAL : %s\n",yytext);
+    return EQUAL;
+}
+
+{and} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("AND : %s\n",yytext);
+    return AND;
+}
+
+{assign_op} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("ASSIGN_OP : %s\n",yytext);
+    return ASSIGN_OP;
+}
+
+{digit}+ { 
+    yylval.i = atoi(yytext);
+    verbose("INT : %d\n",atoi(yytext)); 
+    return INT;
+}
+
+{id} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("ID : %s\n",yytext);
+    return ID;
+}
+
+{comma} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("COMMA : %s\n",yytext);
+    return COMMA;
+}
+
+{semicolon} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("SEMICOLON : %s\n",yytext);
+    return SEMICOLON;
+}
+
+[+*;()\[\]{}!] {  
+    verbose("%s\n",yytext);
+    return *yytext;
+}
+
+(\n|\r\n|" "|\t) /* ignore all the rest */
+
+. {
+    printf("tdsc> lexical error: '%s' in line %d.\n", yytext, yylineno);
+}
+
 %%
 
-void yyerror(){
-	printf("%s%d\n","-> ERROR Sintactico en la linea: ",yylineno);
+void yyerror (char *msg) {
+  printf("tdsc> %s: '%s' in line %d.\n", msg, yytext, yylineno);
 }

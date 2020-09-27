@@ -1,2 +1,36 @@
-# Este test falla. una variable no puede ser declarada despues de evaluar una expresion.
-var x = 2; x*1; var y = 1; x+2+y;
+/*
+Este es un comentario de bloque
+*/
+integer variable;
+integer a@;
+
+//definicion funcion
+integer inc(integer x){
+    return x + 1;
+}
+
+// definicion procedimiento
+void inc_void(){
+    x + 1;
+}
+
+// definicion de funcion externa
+extern integer get_int();
+
+integer main(){
+    integer x;
+    bool a;
+    bool b;
+    bool c;
+    a = true;
+    b = false;
+    c = a && b;
+    c = a = !b;
+    y = 1;
+    {
+        integer x;
+        x = 2;
+        y = x + 1;
+    }
+    return x;
+}
