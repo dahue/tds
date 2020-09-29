@@ -1,5 +1,6 @@
 /*
-Este es un comentario de bloque
+Este test falla, tiene un error lexico en la linea 5 "@"
+en la linea 29 hay un error sintactico usando la asignacion
 */
 integer variable;
 integer a@;
@@ -26,11 +27,4 @@ integer main(){
     b = false;
     c = a && b;
     c = a = !b;
-    y = 1;
-    {
-        integer x;
-        x = 2;
-        y = x + 1;
-    }
-    return x;
 }

@@ -1,4 +1,6 @@
-
+/*
+Este test falla, se intenta declarar la variable y despues de una asignacion
+*/
 integer inc(integer x, bool s){
     return x + 1;
 }
@@ -9,10 +11,4 @@ extern void print_int(integer i);
 integer main(){
     y = 1;
     integer y;
-    {
-        integer x;
-        x = 2;
-        y = x + 1;
-    }
-    return x;
 }
