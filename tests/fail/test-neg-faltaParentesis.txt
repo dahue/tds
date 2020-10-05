@@ -1,0 +1,3 @@
+void metodo1 (bool x,y {
+    
+}

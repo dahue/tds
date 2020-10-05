@@ -1,0 +1,2 @@
+integer aux;
+extern integer suma();

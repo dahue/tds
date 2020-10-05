@@ -1,0 +1,6 @@
+integer x;
+void metodo1(){
+    bool esMenor;
+    integer menor,mayor;
+    esMenor = !(menor == mayor);
+}

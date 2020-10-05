@@ -1,0 +1,30 @@
+/*
+Este test falla, tiene un error lexico en la linea 5 "@"
+en la linea 29 hay un error sintactico usando la asignacion
+*/
+integer variable;
+integer a@;
+
+//definicion funcion
+integer inc(integer x){
+    return x + 1;
+}
+
+// definicion procedimiento
+void inc_void(){
+    x + 1;
+}
+
+// definicion de funcion externa
+extern integer get_int();
+
+integer main(){
+    integer x;
+    bool a;
+    bool b;
+    bool c;
+    a = true;
+    b = false;
+    c = a && b;
+    c = a = !b;
+}

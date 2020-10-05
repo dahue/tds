@@ -1,0 +1,8 @@
+bool esMenor;
+integer min,max;
+integer calcMax (integer min,integer max){
+    return min;
+}
+void toString() {
+
+}

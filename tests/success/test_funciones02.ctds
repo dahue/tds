@@ -1,0 +1,50 @@
+/*
+Este test es correcto
+*/
+integer variable;
+integer a;
+
+//definicion funcion
+integer inc(integer x){
+    return x + 1;
+}
+
+//definicion funcion
+integer inc(integer x){
+    ;
+}
+
+//definicion funcion
+integer factorial(integer x, bool flag){
+    x =  x * 5  + 10;
+    flag =  flag && true;
+    return x + 1;
+}
+
+// definicion procedimiento
+void inc_void(){
+    x= x + 1;
+    {   }
+    
+}
+
+// definicion de funcion externa
+extern integer get_int();
+
+integer main(){
+    integer x;
+    bool a;
+    bool b;
+    { bool c;} // Por ahora este test va a ser correcto. Pero cuando incorporemos el analisis semántico va a dar error, porque la variable c no esta viva cuando se la pretende utilizar fuera del bloque.
+    a = true;
+    b = false;
+    c = a && b;
+    c = a == !b;
+    y = 1;
+    {
+        integer x;
+        x = 2;
+        y = x + 1;
+    }
+    return x;
+}
