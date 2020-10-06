@@ -3,6 +3,16 @@
 #include<stdlib.h>
 #include "symbol_table.h"
   
+struct Symbol *newSymbol(enum flag flag, char* name, enum type type){
+   struct Symbol* symbol = (struct Symbol*)malloc(sizeof(struct Symbol));
+   symbol->flag = flag;
+   symbol->name = name;
+   symbol->type = type;
+   symbol->value = 0;
+   symbol->param = NULL;
+   return symbol;
+}
+
 GList *newSymbolTable(){
    GList *stack = NULL;
    GList *list = NULL;
@@ -12,51 +22,82 @@ GList *newSymbolTable(){
 
 GList *addLevel(GList *stack){
    GList *newLevel = NULL;
-   stack = g_list_append(stack, newLevel);
+   stack = g_list_prepend(stack, newLevel);
    return stack;
 }
 
 GList *removeLevel(GList *stack){
-   stack = g_list_remove_link(stack, g_list_last(stack));
+   stack = g_list_remove_link(stack, stack);
    return stack;
 }
 
 GList *insertSymbol(GList *stack, struct Symbol *symbol){
-   g_list_last(stack)->data = g_list_append(g_list_last(stack)->data, symbol);
+   stack->data = g_list_prepend(stack->data, symbol);
    return stack;
 }
 
-struct Symbol *findSymbol(GList *stack, struct Symbol *symbol);
-
-int main(void)
-{
-   // GList *stack = NULL;
-   // GList *list = NULL;
-   // list = g_list_append (list, "first");
-   // list = g_list_append (list, "second");
-   // stack = g_list_append(stack, list);
-   // printf("The list is now %d items long\n", g_list_length(list));
-   // printf("The first item is '%s'\n", (char*)g_list_first(list)->data);
-   // printf("The first item is '%s'\n", (char*)g_list_first(list)->data);
-
-   GList *symbol_table = newSymbolTable();
-   symbol_table = addLevel(symbol_table);
-   struct Symbol *s = (struct Symbol*)malloc(sizeof(struct Symbol));
-   s->value = 6;
-   s->name = "x";
-   symbol_table = insertSymbol(symbol_table, s);
-   // printf("The first item is '%s'\n", (char*)(g_list_first(symbol_table)->data)->data);
-   GList * a = g_list_last(symbol_table)->data;
-   printf("The list is now %d items long\n", g_list_length(symbol_table));
-   printf("The list is now %d items long\n", g_list_length(g_list_last(symbol_table)->data));
-   printf("The list is now %d items long\n", g_list_length(symbol_table->data));
-   struct Symbol * b = a->data;
-
-   int c = b->value;
-
-   printf("The first item is '%d'\n", c);
-
+gint comparator(gconstpointer a, gconstpointer b){
+   struct Symbol *symbol1 = (struct Symbol *)a;
+   struct Symbol *symbol2 = (struct Symbol *)b;
+   char* str1 = symbol1->name;
+   char* str2 = symbol2->name;
+   return strcmp (str1, str2);
 }
 
+struct Symbol *findSymbolRecursively(GList *stack_level, struct Symbol *symbol){
+   if (stack_level == NULL){
+      return NULL;
+   }
+   GList *current_level = stack_level->data;
+   GList *res = g_list_find_custom(current_level, symbol, &comparator);
+   if (res != NULL) {
+      return res->data;
+   }
+   else{
+      return findSymbolRecursively(g_list_previous(stack_level), symbol);
+   }
+}
 
-// gcc ‑I/usr/include/glib‑2.0 ‑I/usr/lib/glib‑2.0/include ‑lglib‑2.0 ‑o ex‑compile ex‑compile.c
+struct Symbol *findSymbol(GList *stack, struct Symbol *symbol){
+   return findSymbolRecursively(g_list_last(stack), symbol);
+}
+
+// int main(void)
+// {
+//    GList *symbol_table = newSymbolTable();
+   
+//    struct Symbol *s = newSymbol(E_ID, "x", E_INTEGER);
+//    s->value = 6;
+   
+//    symbol_table = insertSymbol(symbol_table, s);
+
+//    symbol_table = addLevel(symbol_table);
+
+//    printf("Symbol table is %d items long\n", g_list_length(symbol_table));
+//    printf("Top of symbol list is %d items long\n", g_list_length(symbol_table->data));
+//    printf("Bottom of symbol list is %d items long\n", g_list_length(g_list_last(symbol_table)->data));
+
+//    struct Symbol *s2 = newSymbol(E_ID, "y", E_INTEGER);
+//    s2->value = 4;
+//    symbol_table = insertSymbol(symbol_table, s2);
+
+//    struct Symbol *s3 = newSymbol(E_ID, "y", E_INTEGER);
+//    s3->value = 5;
+//    symbol_table = insertSymbol(symbol_table, s3);
+
+//    symbol_table = removeLevel(symbol_table);
+
+//    printf("Symbol table is %d items long\n", g_list_length(symbol_table));
+//    printf("Top of symbol list is %d items long\n", g_list_length(symbol_table->data));
+//    printf("Bottom of symbol list is %d items long\n", g_list_length(g_list_last(symbol_table)->data));
+
+//    struct Symbol * r = findSymbol(symbol_table, s);
+//    if (r != NULL){
+//       printf("'%s' found -> '%d'\n", r->name, r->value);
+//    }
+//    else{
+//       printf("Not found\n");
+//    }
+// }
+
+

@@ -1,6 +1,13 @@
 # Taller de Diseño de Software
 ## Repositiorio de la materia Taller de Diseño de Software (2020)
 
+## Requisitos
+ - gcc
+ - glib
+ ```
+sudo apt-get install libglib2.0-dev
+```
+ - make
  - Para compilar, ejecutar en la raiz del proyecto:
 
 ```

@@ -33,7 +33,7 @@ all: tdsc
 tdsc: syntactic_analyzer
 	@echo "Building tdsc"
 	mkdir -p bin/
-	${CC} ${SRCDIR}/lexical_analyzer.c ${SRCDIR}/main.c -o bin/$@
+	${CC} ${SRCDIR}/lexical_analyzer.c ${SRCDIR}/main.c -o bin/$@ `pkg-config --cflags --libs glib-2.0`
 
 syntactic_analyzer: lexical_analyzer
 	@echo "Compiling syntactic analyzer"

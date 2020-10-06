@@ -1,25 +1,17 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
-
 #include <glib.h>
 
+enum flag{E_ID, E_FUNC, E_PARAM};
+enum type{E_VOID, E_INTEGER, E_BOOL};
+
 struct Symbol {
-    char* flag;
+    enum flag flag;
     char* name;
-    char* type;
+    enum type type;
     int value;
-    struct Symbol* params;
+    struct Symbol* param;
 };
-
-// struct Node { 
-//     struct Symbol* data; 
-//     struct Node* next;
-// };
-
-// struct StackNode {
-//     struct Node* top;
-//     struct StackNode* next;
-// };
 
 GList *newSymbolTable();
 

@@ -1,4 +1,5 @@
 %{
+#include "util/symbol_table.h"
 
 int yylex();
 void yyerror();
@@ -14,10 +15,10 @@ void yyerror();
 %token<i> INT
 %token<s> ID
 
-%token INTEGER
-%token BOOL
-%token FALSE
-%token TRUE
+%token<s> INTEGER
+%token<s> BOOL
+%token V_FALSE
+%token V_TRUE
 %token EXTERN
 %token RETURN
 %token VOID
@@ -26,6 +27,8 @@ void yyerror();
 %token ASSIGN_OP
 %token COMMA
 %token SEMICOLON
+
+// %type<s> var_list
 
 %left AND
 %nonassoc EQUAL
@@ -49,7 +52,13 @@ var_decl_list:
   ;
 
 var_decl:
-    type var_list SEMICOLON
+    type var_list SEMICOLON {
+      // printf(" %d ", $2); 
+    //   struct Symbol* v = (struct Symbol*) malloc(sizeof(struct Symbol));
+    //   v->flag = 'variable';
+    //   v->name = $2;
+    //   v->type = $1;
+    }
   ;
 
 var_list:
@@ -58,7 +67,7 @@ var_list:
   ;
 
 type:
-    INTEGER
+    INTEGER {}
   | BOOL
   ;
 
@@ -95,7 +104,6 @@ statement_list:
 statement:
     ID ASSIGN_OP expression SEMICOLON
   | RETURN expression SEMICOLON
-  | expression SEMICOLON
   | SEMICOLON
   | block
   ;
@@ -121,8 +129,8 @@ integer_literal:
   ;
 
 bool_literal:
-    TRUE
-  | FALSE
+    V_TRUE
+  | V_FALSE
   ;
  
 %%
