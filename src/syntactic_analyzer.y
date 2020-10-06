@@ -1,5 +1,6 @@
 %{
 #include "util/symbol_table.h"
+#include "util/verbose.c"
 
 int yylex();
 void yyerror();
@@ -28,7 +29,8 @@ void yyerror();
 %token COMMA
 %token SEMICOLON
 
-// %type<s> var_list
+%type<s> var_list
+%type<s> type
 
 %left AND
 %nonassoc EQUAL
@@ -53,22 +55,24 @@ var_decl_list:
 
 var_decl:
     type var_list SEMICOLON {
-      // printf(" %d ", $2); 
-    //   struct Symbol* v = (struct Symbol*) malloc(sizeof(struct Symbol));
-    //   v->flag = 'variable';
-    //   v->name = $2;
-    //   v->type = $1;
+
     }
   ;
 
 var_list:
-    ID
+    ID {
+      verbose("%s%s\n", "AS_ID: ",$1);
+    }
   | var_list COMMA ID
   ;
 
 type:
-    INTEGER {}
-  | BOOL
+    INTEGER {
+      verbose("%s%s\n", "AS_TYPE: ",$1);
+    }
+  | BOOL {
+      verbose("%s%s\n", "AS_TYPE: ",$1);
+    }
   ;
 
 method_decl_list:

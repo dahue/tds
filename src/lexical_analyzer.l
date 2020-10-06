@@ -1,6 +1,6 @@
 %{
 #include "syntactic_analyzer.h"
-#include "util/verbose.c"
+#include "util/verbose.h"
 %}
 
 %option noyywrap
