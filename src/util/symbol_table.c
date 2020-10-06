@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include <gmodule.h>
 #include "symbol_table.h"
   
 struct Symbol *newSymbol(enum flag flag, char* name, enum type type){
@@ -15,13 +16,13 @@ struct Symbol *newSymbol(enum flag flag, char* name, enum type type){
 
 GList *newSymbolTable(){
    GList *stack = NULL;
-   GList *list = NULL;
-   stack = g_list_append(stack, list);
+   GHashTable *hash_table = g_hash_table_new(g_str_hash, g_str_equal);
+   stack = g_list_prepend(stack, hash_table);
    return stack;
 }
 
 GList *addLevel(GList *stack){
-   GList *newLevel = NULL;
+   GHashTable *newLevel = g_hash_table_new(g_str_hash, g_str_equal);
    stack = g_list_prepend(stack, newLevel);
    return stack;
 }
@@ -32,34 +33,26 @@ GList *removeLevel(GList *stack){
 }
 
 GList *insertSymbol(GList *stack, struct Symbol *symbol){
-   stack->data = g_list_prepend(stack->data, symbol);
+   g_hash_table_insert (stack->data, symbol->name, symbol);
    return stack;
-}
-
-gint comparator(gconstpointer a, gconstpointer b){
-   struct Symbol *symbol1 = (struct Symbol *)a;
-   struct Symbol *symbol2 = (struct Symbol *)b;
-   char* str1 = symbol1->name;
-   char* str2 = symbol2->name;
-   return strcmp (str1, str2);
 }
 
 struct Symbol *findSymbolRecursively(GList *stack_level, struct Symbol *symbol){
    if (stack_level == NULL){
       return NULL;
    }
-   GList *current_level = stack_level->data;
-   GList *res = g_list_find_custom(current_level, symbol, &comparator);
+   GHashTable *current_level = stack_level->data;
+   struct Symbol *res = g_hash_table_lookup(current_level, symbol->name);
    if (res != NULL) {
-      return res->data;
+      return res;
    }
    else{
-      return findSymbolRecursively(g_list_previous(stack_level), symbol);
+      return findSymbolRecursively(g_list_next(stack_level), symbol);
    }
 }
 
 struct Symbol *findSymbol(GList *stack, struct Symbol *symbol){
-   return findSymbolRecursively(g_list_last(stack), symbol);
+   return findSymbolRecursively(stack, symbol);
 }
 
 // int main(void)
@@ -74,22 +67,22 @@ struct Symbol *findSymbol(GList *stack, struct Symbol *symbol){
 //    symbol_table = addLevel(symbol_table);
 
 //    printf("Symbol table is %d items long\n", g_list_length(symbol_table));
-//    printf("Top of symbol list is %d items long\n", g_list_length(symbol_table->data));
-//    printf("Bottom of symbol list is %d items long\n", g_list_length(g_list_last(symbol_table)->data));
+//    printf("Top of symbol list is %d items long\n", g_hash_table_size(symbol_table->data));
+//    printf("Bottom of symbol list is %d items long\n", g_hash_table_size(g_list_last(symbol_table)->data));
 
 //    struct Symbol *s2 = newSymbol(E_ID, "y", E_INTEGER);
 //    s2->value = 4;
 //    symbol_table = insertSymbol(symbol_table, s2);
 
-//    struct Symbol *s3 = newSymbol(E_ID, "y", E_INTEGER);
+//    struct Symbol *s3 = newSymbol(E_ID, "x", E_INTEGER);
 //    s3->value = 5;
 //    symbol_table = insertSymbol(symbol_table, s3);
 
-//    symbol_table = removeLevel(symbol_table);
+//    // symbol_table = removeLevel(symbol_table);
 
 //    printf("Symbol table is %d items long\n", g_list_length(symbol_table));
-//    printf("Top of symbol list is %d items long\n", g_list_length(symbol_table->data));
-//    printf("Bottom of symbol list is %d items long\n", g_list_length(g_list_last(symbol_table)->data));
+//    printf("Top of symbol list is %d items long\n", g_hash_table_size(symbol_table->data));
+//    printf("Bottom of symbol list is %d items long\n", g_hash_table_size(g_list_last(symbol_table)->data));
 
 //    struct Symbol * r = findSymbol(symbol_table, s);
 //    if (r != NULL){
