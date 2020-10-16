@@ -3,7 +3,7 @@
 #include <string.h>
 #include "syntactic_analyzer.c"
 #include "util/verbose.h"
-// #include <stdbool.h>
+#include "util/ast.c"
 
 extern FILE * yyin;
 
@@ -26,6 +26,9 @@ int main(int argc,char *argv[]){
 	else{
 		yyin = stdin;
 	}
-	
 	yyparse();
+
+	GNode *tree = returnAST();
+
+	typeCheck(tree);
 }
