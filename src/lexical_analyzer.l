@@ -1,4 +1,6 @@
 %{
+#include <glib.h>
+#include <stdbool.h>
 #include "syntactic_analyzer.h"
 #include "util/verbose.h"
 %}

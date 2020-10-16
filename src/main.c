@@ -3,7 +3,7 @@
 #include <string.h>
 #include "syntactic_analyzer.c"
 #include "util/verbose.h"
-#include <stdbool.h>
+// #include <stdbool.h>
 
 extern FILE * yyin;
 
@@ -26,5 +26,6 @@ int main(int argc,char *argv[]){
 	else{
 		yyin = stdin;
 	}
+	
 	yyparse();
 }
