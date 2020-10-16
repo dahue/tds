@@ -67,11 +67,7 @@ main: {stack = newSymbolTable(stack);} program {tree = $2;};
 
 program:
     var_decl_list {
-        struct Symbol *s = newSymbol();
-        s->name = "VAR_DECL_LIST";
-        GNode *parent = g_node_new(s);
-        g_node_append(parent, $1);
-        $$ = parent;
+        $$ = NULL;
     }
     | method_decl_list {
         struct Symbol *s = newSymbol();
@@ -84,7 +80,6 @@ program:
         struct Symbol *s = newSymbol();
         s->name = "VAR_METHOD_DECL_LIST";
         GNode *parent = g_node_new(s);
-        g_node_append(parent, $1);
         g_node_append(parent, $2);
         $$ = parent;
     }
@@ -92,34 +87,14 @@ program:
 
 var_decl_list:
     var_decl {
-        struct Symbol *s = newSymbol();
-        s->name = "SEMICOLON";
-        GNode *parent = g_node_new(s);
-        GList *l = g_hash_table_get_values($1->data);
-        int i;
-        struct Symbol *e = NULL;
-        for (i=0; i< g_list_length(l); i++){
-            e = (struct Symbol*)g_list_nth_data(l, i);
-            g_node_append(parent, g_node_new(e));
-        }
-        $$ = parent;
     }
     | var_decl_list var_decl {
-        GNode *parent = $1;
-        GList *l = g_hash_table_get_values($2->data);
-        int i;
-        struct Symbol *e = NULL;
-        for (i=0; i< g_list_length(l); i++){
-            e = (struct Symbol*)g_list_nth_data(l, i);
-            g_node_append(parent, g_node_new(e));
-        }
-        $$ = parent;
     }
   ;
 
 var_decl:
     type var_list SEMICOLON {
-        printf("%s%d\n", "PARSER_TYPE: ",$1);
+        // printf("%s%d\n", "PARSER_TYPE: ",$1);
         int i;
         for (i=0; i < g_list_length($2); i++){
             char *name = (char*)g_list_nth_data($2, i);
@@ -128,7 +103,7 @@ var_decl:
             s->name = name;
             s->type = $1;
             if (exists(stack, name) == NULL){
-                printf("%s%s\n", "PARSER_ID: ",name);
+                // printf("%s%s\n", "PARSER_ID: ",name);
                 stack = insertSymbol(stack, s);
             }
             else {
@@ -178,8 +153,8 @@ method_decl_list:
 
 method_decl:
     type ID '(' {stack = addLevel(stack);} method_decl_params ')' block {stack = removeLevel(stack);
-        printf("%s%d\n", "PARSER_TYPE: ",$1);
-        printf("%s%s\n", "PARSER_ID: ",$2);
+        // printf("%s%d\n", "PARSER_TYPE: ",$1);
+        // printf("%s%s\n", "PARSER_ID: ",$2);
 
         char* name = $2;
         struct Symbol *s = newSymbol();
@@ -189,7 +164,7 @@ method_decl:
         s->param = $5;
 
         if (exists(stack, name) == NULL){
-            printf("%s%s\n", "PARSER_ID: ",name);
+            // printf("%s%s\n", "PARSER_ID: ",name);
             stack = insertSymbol(stack, s);
         }
         else {
@@ -212,7 +187,7 @@ method_decl:
         s->param = $6;
 
         if (exists(stack, name) == NULL){
-            printf("%s%s\n", "PARSER_ID: ",name);
+            // printf("%s%s\n", "PARSER_ID: ",name);
             stack = insertSymbol(stack, s);
         }
         else {
@@ -234,7 +209,7 @@ method_decl_params:
             // printf("%s%d\n", "PARSER_TYPE: ",type);
             // printf("%s",toString(s));
             if (exists(stack, name) == NULL){
-                printf("%s%s\n", "PARSER_ID: ",name);
+                // printf("%s%s\n", "PARSER_ID: ",name);
                 stack = insertSymbol(stack, s);
             }          
             else{
@@ -266,32 +241,16 @@ method_decl_params_list:
 
 block:
     open_brace close_brace {
-        struct Symbol *s = newSymbol();
-        s->name = "BLOCK";
-        GNode *parent = g_node_new(s);
-        $$ = parent;
+        $$ = NULL;
     }
     | open_brace var_decl_list close_brace {
-        struct Symbol *s = newSymbol();
-        s->name = "BLOCK";
-        GNode *parent = g_node_new(s);
-        g_node_append(parent, $2);
-        $$ = parent;
+        $$ = NULL;
     }
     | open_brace statement_list close_brace {
-        struct Symbol *s = newSymbol();
-        s->name = "BLOCK";
-        GNode *parent = g_node_new(s);
-        g_node_append(parent, $2);
-        $$ = parent;
+        $$ = $2;
     }
     | open_brace var_decl_list statement_list close_brace{
-        struct Symbol *s = newSymbol();
-        s->name = "BLOCK";
-        GNode *parent = g_node_new(s);
-        // g_node_append(parent, $2);
-        g_node_append(parent, $3);
-        $$ = parent;
+        $$ = $3;
     }
   ;
 
@@ -319,9 +278,9 @@ statement_list:
 
 statement:
     ID ASSIGN_OP expression SEMICOLON {
+        GNode *first_child = g_node_new(findSymbol(stack, $1));
         struct Symbol *s = newSymbol();
         s->name = "ASSIGN_OP";
-        GNode *first_child = g_node_new(findSymbol(stack, $1));
         // printf("%s %s\n", ((struct Symbol*)first_child->data)->name, ((struct Symbol*)$3->data)->name);
         // printf("%d %d\n", ((struct Symbol*)first_child->data)->type, ((struct Symbol*)$3->data)->type);
         GNode *parent = g_node_new(s);
@@ -353,63 +312,46 @@ statement:
 
 expression:
     ID {
-        // struct Symbol *s = findSymbol(stack, newSymbol(E_ID, $1, E_ID));
-        // $$ = g_node_new (s);
-        // printf("flag: %d, type: %d, name: %s, value: %d, param %s\n", s->flag, s->type, s->name, s->value, s->param);
-        // if (s != NULL) 
-        //     $$ = g_node_new(s);
-        // else 
-        //     printf("Variable '%s' no declarada \n",$1);
-
         struct Symbol *s = findSymbol(stack, $1);
-        $$ = g_node_new(s);
+        if (s != NULL){
+            $$ = g_node_new(s);
+        }
+        else{
+            printf("variable not defined.");
+        }
+        
     }
     | integer_literal{
         struct Symbol *s = newSymbol();
-        s->type = E_INTEGER;
-
         int length = snprintf( NULL, 0, "%d", $1 );
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", $1 );
-        // printf("%s", str);
+        s->type = E_INTEGER;
         s->name = str;
         s->value_int = $1;
         $$ = g_node_new(s);
     }
     | bool_literal{
-        // printf("%d\n", $1);
         struct Symbol *s = newSymbol();
-        s->type = E_BOOL;
-
         int length = snprintf( NULL, 0, "%d", $1 );
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", $1 );
-
+        s->type = E_BOOL;
         s->name = str;
         s->value_bool = $1;
         $$ = g_node_new(s);
     }
     | '!' expression {
-        // struct Symbol *a = $2->data;
-        // assert(a->type == E_BOOL);
         struct Symbol *s = newSymbol();
-        s->type = E_BOOL;
-        s->flag = E_FUNC;
         s->name = "!";
 
         GNode *parent = g_node_new(s);
         g_node_append(parent, $2);
 
         $$ = parent;
-
-        // struct Symbol *p = $$->data;
-        // struct Symbol *a = g_node_nth_child($$, 0)->data;
-        // printf("%s %d\n",p->name, a->value_bool);
     }
     | expression AND expression {
         struct Symbol *s = newSymbol();
-        s->type = E_BOOL;
-        s->flag = E_FUNC;
         s->name = "AND";
 
         GNode *parent = g_node_new(s);
@@ -420,8 +362,6 @@ expression:
     }
     | expression EQUAL expression {
         struct Symbol *s = newSymbol();
-        s->type = E_BOOL;
-        s->flag = E_FUNC;
         s->name = "EQUAL";
 
         GNode *parent = g_node_new(s);
@@ -431,14 +371,7 @@ expression:
         $$ = parent;
     }
     | expression '+' expression {
-        // struct Symbol *a = $1->data;
-        // struct Symbol *b = $3->data;
-        // assert(a->type == b->type);
-        // assert(a->type == E_INTEGER);
-
         struct Symbol *s = newSymbol();
-        s->type = E_INTEGER;
-        s->flag = E_FUNC;
         s->name = "+";
 
         GNode *parent = g_node_new(s);
@@ -446,21 +379,9 @@ expression:
         g_node_append(parent, $3);
 
         $$ = parent;
-        
-        // struct Symbol *p = $$->data;
-        // a = g_node_nth_child($$, 0)->data;
-        // b = g_node_nth_child($$, 1)->data;
-        // printf("%d %s %d\n",a->value_int, p->name, b->value_int);
-
     }
     | expression '*' expression {
-        // struct Symbol *a = $1->data;
-        // struct Symbol *b = $3->data;
-        // assert(a->type == b->type);
-        // assert(a->type == E_INTEGER);
         struct Symbol *s = newSymbol();
-        s->type = E_INTEGER;
-        s->flag = E_FUNC;
         s->name = "*";
 
         GNode *parent = g_node_new(s);
@@ -468,12 +389,6 @@ expression:
         g_node_append(parent, $3);
 
         $$ = parent;
-        
-        // struct Symbol *p = $$->data;
-        // a = g_node_nth_child($$, 0)->data;
-        // b = g_node_nth_child($$, 1)->data;
-        // printf("%d %s %d\n",a->value_int, p->name, b->value_int);
-
     }
     | '(' expression ')' {
         $$ = $2;
@@ -481,12 +396,21 @@ expression:
   ;
 
 integer_literal:
-    INT {$$=$1; printf("%d\n",$1);}
+    INT {
+        $$=$1; 
+        // printf("%d\n",$1);
+    }
   ;
 
 bool_literal:
-    V_TRUE {$$=$1; printf("%d\n",$1);}
-    | V_FALSE {$$=$1; printf("%d\n",$1);}
+    V_TRUE {
+        $$=$1; 
+        // printf("%d\n",$1);
+    }
+    | V_FALSE {
+        $$=$1; 
+        // printf("%d\n",$1);
+    }
   ;
  
 %%

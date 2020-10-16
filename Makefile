@@ -62,10 +62,10 @@ clean:
 
 test:
 	@echo "Running test1"
-	bin/tdsc tests/test1.txt
+	bin/tdsc tests/test1.tds
 	@echo "Running test2"
-	bin/tdsc tests/test2.txt
-	@echo "Running test3"
-	bin/tdsc tests/test3.txt
-	@echo "Running test4"
-	bin/tdsc tests/test4.txt
+	bin/tdsc tests/test2.tds
+# @echo "Running test3"
+# bin/tdsc tests/test3.txt
+# @echo "Running test4"
+# bin/tdsc tests/test4.txt

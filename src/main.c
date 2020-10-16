@@ -29,6 +29,5 @@ int main(int argc,char *argv[]){
 	yyparse();
 
 	GNode *tree = returnAST();
-
 	typeCheck(tree);
 }

@@ -1,0 +1,43 @@
+/*
+Este test es correcto
+*/
+integer v;
+integer a;
+bool w, x, y, z;
+
+//definicion funcion
+integer inc(integer x, integer v){
+    integer x;
+    integer v;
+    {
+        integer x;
+    }
+    v = 1;
+    return x + v;
+}
+
+// definicion procedimiento
+void inc_void(){
+    v = a + 1;
+}
+
+// definicion de funcion externa
+extern integer get_int();
+
+integer main(){
+    integer x;
+    bool a;
+    bool b;
+    bool c;
+    a = true;
+    b = false;
+    c = a && b;
+    c = z == !b;
+    v = 1;
+    {
+        integer x;
+        x = 2;
+        v = x + 1;
+    }
+    return a;
+}

@@ -1,11 +1,13 @@
 # Taller de Diseño de Software
 ## Repositiorio de la materia Taller de Diseño de Software (2020)
-
-## Requisitos
+---
+### (Importante: aun no esta terminado el chequeo de tipos en funciones. Tambien probablemente hayan casos donde falle el analisis semantico. En el proximo release deberia estar todo funcionando apropiadamente)
+---
+### Requisitos
  - gcc
  - glib
  ```
-sudo apt-get install libglib2.0-dev
+sudo apt-get install libglib2.0-dev -y 
 ```
  - make
  - Para compilar, ejecutar en la raiz del proyecto:
@@ -25,8 +27,8 @@ make test
 ```
 bin/tdsc -v tests/test1.txt # Test exitoso
 bin/tdsc -v tests/test2.txt # Test exitoso
-bin/tdsc -v tests/test3.txt # Test que falla
-bin/tdsc -v tests/test4.txt # Test que falla
+bin/tdsc -v tests/test3.txt # Test que falla (no disponible)
+bin/tdsc -v tests/test4.txt # Test que falla (no disponible)
 ```
 
  - Para eliminar los archivos de codigo generado y el archivo binario:
