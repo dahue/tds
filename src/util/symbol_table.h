@@ -3,9 +3,8 @@
 #include <glib.h>
 #include <stdbool.h>
 
-enum flag{E_ID, E_FUNC, E_PARAM};
-enum type{E_VOID, E_INTEGER, E_BOOL};
-// typedef enum { false, true } bool;
+enum flag{EF_INDF, E_ID, E_FUNC, E_PARAM};
+enum type{E_INDF, E_VOID, E_INTEGER, E_BOOL};
 
 struct Symbol {
     enum flag flag;

@@ -1,8 +1,6 @@
 # Taller de Diseño de Software
 ## Repositiorio de la materia Taller de Diseño de Software (2020)
----
-### (Importante: aun no esta terminado el chequeo de tipos en funciones. Tambien probablemente hayan casos donde falle el analisis semantico. En el proximo release deberia estar todo funcionando apropiadamente)
----
+
 ### Requisitos
  - gcc
  - glib

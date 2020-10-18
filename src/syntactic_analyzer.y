@@ -241,10 +241,10 @@ method_decl_params_list:
 
 block:
     open_brace close_brace {
-        $$ = NULL;
+        $$ = g_node_new(newSymbol());
     }
     | open_brace var_decl_list close_brace {
-        $$ = NULL;
+        $$ = g_node_new(newSymbol());
     }
     | open_brace statement_list close_brace {
         $$ = $2;
@@ -281,16 +281,10 @@ statement:
         GNode *first_child = g_node_new(findSymbol(stack, $1));
         struct Symbol *s = newSymbol();
         s->name = "ASSIGN_OP";
-        // printf("%s %s\n", ((struct Symbol*)first_child->data)->name, ((struct Symbol*)$3->data)->name);
-        // printf("%d %d\n", ((struct Symbol*)first_child->data)->type, ((struct Symbol*)$3->data)->type);
         GNode *parent = g_node_new(s);
         g_node_append(parent, first_child);
         g_node_append(parent, $3);
         $$ = parent;
-        // printf("%s\n", ((struct Symbol*)parent->data)->name);
-        // struct Symbol *l = g_node_nth_child(parent, 0)->data;
-        // struct Symbol *r = g_node_nth_child(parent, 1)->data;
-        // printf("%s %s\n", l->name, r->name);
     }
     | RETURN expression SEMICOLON {
         struct Symbol *s = newSymbol();
@@ -344,7 +338,7 @@ expression:
     | '!' expression {
         struct Symbol *s = newSymbol();
         s->name = "!";
-
+        s->flag = E_FUNC;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $2);
 
@@ -353,7 +347,7 @@ expression:
     | expression AND expression {
         struct Symbol *s = newSymbol();
         s->name = "AND";
-
+        s->flag = E_FUNC;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -363,7 +357,7 @@ expression:
     | expression EQUAL expression {
         struct Symbol *s = newSymbol();
         s->name = "EQUAL";
-
+        s->flag = E_FUNC;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -373,7 +367,7 @@ expression:
     | expression '+' expression {
         struct Symbol *s = newSymbol();
         s->name = "+";
-
+        s->flag = E_FUNC;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -383,7 +377,7 @@ expression:
     | expression '*' expression {
         struct Symbol *s = newSymbol();
         s->name = "*";
-
+        s->flag = E_FUNC;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);

@@ -10,20 +10,17 @@ enum type func_type;
 
 gboolean foo (GNode *node, gpointer data){
     struct Symbol *s = node->data;
-    printf("%s\n", s->name);
+    // printf("node: %s, flag: %d, type %d\n", s->name,s->flag, s->type);
 
     if (strcmp(s->name, "ASSIGN_OP") == 0){
         struct Symbol *l = g_node_nth_child(node, 0)->data;
         struct Symbol *r = g_node_nth_child(node, 1)->data;
-        printf("types: %d %d\n", l->type, r->type);
-        printf("names: %s %s\n", l->name, r->name);
         assert(l->type == r->type);
         s->type = l->type;
     }
     else if (strcmp(s->name, "+") == 0){
         struct Symbol *l = g_node_nth_child(node, 0)->data;
         struct Symbol *r = g_node_nth_child(node, 1)->data;
-        printf("types: %d %d\n", l->type, r->type);
         assert(l->type == r->type);
         assert(l->type == E_INTEGER);
         s->type = E_INTEGER;
@@ -31,7 +28,6 @@ gboolean foo (GNode *node, gpointer data){
     else if (strcmp(s->name, "*") == 0){
         struct Symbol *l = g_node_nth_child(node, 0)->data;
         struct Symbol *r = g_node_nth_child(node, 1)->data;
-        printf("types: %d %d\n", l->type, r->type);
         assert(l->type == r->type);
         assert(l->type == E_INTEGER);
         s->type = E_INTEGER;
@@ -39,7 +35,6 @@ gboolean foo (GNode *node, gpointer data){
     else if (strcmp(s->name, "AND") == 0){
         struct Symbol *l = g_node_nth_child(node, 0)->data;
         struct Symbol *r = g_node_nth_child(node, 1)->data;
-        printf("types: %d %d\n", l->type, r->type);
         assert(l->type == r->type);
         assert(l->type == E_BOOL);
         s->type = E_BOOL;
@@ -47,32 +42,27 @@ gboolean foo (GNode *node, gpointer data){
     else if (strcmp(s->name, "EQUAL") == 0){
         struct Symbol *l = g_node_nth_child(node, 0)->data;
         struct Symbol *r = g_node_nth_child(node, 1)->data;
-        printf("types: %d %d\n", l->type, r->type);
         assert(l->type == r->type);
         s->type = E_BOOL;
 
     }
     else if (strcmp(s->name, "!") == 0){
         struct Symbol *l = g_node_nth_child(node, 0)->data;
-        printf("types: %d\n", l->type);
         assert(l->type == E_BOOL);
         s->type = E_BOOL;
     }
-    // else if (s->flag == E_FUNC){
-    //     printf("func_name: %s\n", s->name);
-    //     func_type = s->type;
-    // }
-    // else if (strcmp(s->name, "RETURN") == 0){
-    //     struct Symbol *l = g_node_nth_child(node, 0)->data;
-    //     printf("types: %d\n", l->type);
-    //     assert(l->type == func_type);
-    // }
+    else if (strcmp(s->name, "RETURN") == 0){
+        struct Symbol *p = ((node->parent)->parent)->data;
+        struct Symbol *l = g_node_nth_child(node, 0)->data;
+        printf("parent node: %s, flag: %d, type %d\n", p->name, p->flag, p->type);
+        printf("child node: %s, flag: %d, type %d\n", l->name, l->flag, l->type);
+        assert(p->type == l->type);
+        s->type = l->type;
+    }
+    printf("node: %s, flag: %d, type %d\n", s->name,s->flag, s->type);
     return false;
 }
 
 bool typeCheck(GNode *root){
-    // struct Symbol *s = root->data;
-    // printf("%s\n", s->name);
-
     g_node_traverse (root, G_POST_ORDER, G_TRAVERSE_ALL, -1, foo, NULL);
 }

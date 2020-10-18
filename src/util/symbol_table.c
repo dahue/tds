@@ -4,10 +4,11 @@
 #include <gmodule.h>
 #include "symbol_table.h"
 
-// GList *stack = NULL;
-
 struct Symbol *newSymbol(){
    struct Symbol* symbol = (struct Symbol*)malloc(sizeof(struct Symbol));
+   symbol->name = "e_indf";
+   symbol->flag = EF_INDF;
+   symbol->type = E_INDF;
    return symbol;
 }
 
@@ -62,42 +63,3 @@ struct Symbol *findSymbolRecursively(GList *stack_level, char *name){
 struct Symbol *findSymbol(GList *stack, char *name){
    return findSymbolRecursively(stack, name);
 }
-
-
-// int main(void)
-// {
-//    GList *symbol_table = newSymbolTable();
-   
-//    struct Symbol *s = newSymbol(E_ID, "x", E_INTEGER);
-//    s->value = 6;
-   
-//    symbol_table = insertSymbol(s);
-
-//    symbol_table = addLevel();
-
-//    printf("Symbol table is %d items long\n", g_list_length(symbol_table));
-//    printf("Top of symbol list is %d items long\n", g_hash_table_size(symbol_table->data));
-//    printf("Bottom of symbol list is %d items long\n", g_hash_table_size(g_list_last(symbol_table)->data));
-
-//    struct Symbol *s2 = newSymbol(E_ID, "y", E_INTEGER);
-//    s2->value = 4;
-//    symbol_table = insertSymbol(s2);
-
-//    struct Symbol *s3 = newSymbol(E_ID, "x", E_INTEGER);
-//    s3->value = 5;
-//    symbol_table = insertSymbol(s3);
-
-//    symbol_table = removeLevel();
-
-//    printf("Symbol table is %d items long\n", g_list_length(symbol_table));
-//    printf("Top of symbol list is %d items long\n", g_hash_table_size(symbol_table->data));
-//    printf("Bottom of symbol list is %d items long\n", g_hash_table_size(g_list_last(symbol_table)->data));
-
-//    struct Symbol * r = findSymbol(s2);
-//    if (r != NULL){
-//       printf("'%s' found -> '%d'\n", r->name, r->value);
-//    }
-//    else{
-//       printf("Not found\n");
-//    }
-// }
