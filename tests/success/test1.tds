@@ -1,24 +1,19 @@
 /*
 Este test es correcto
 */
-integer v;
+integer variable;
+integer z;
+integer x;
 integer a;
-bool w, x, y, z;
 
 //definicion funcion
-integer inc(integer x, integer v){
-    integer x;
-    integer v;
-    {
-        integer x;
-    }
-    v = 1;
-    return x + v;
+integer inc(integer x){
+    return x + 1;
 }
 
 // definicion procedimiento
 void inc_void(){
-    v = a + 1;
+    z = x + 1;
 }
 
 // definicion de funcion externa
@@ -26,18 +21,19 @@ extern integer get_int();
 
 integer main(){
     integer x;
+    integer y;
     bool a;
     bool b;
     bool c;
     a = true;
     b = false;
     c = a && b;
-    c = z == !b;
-    v = 1;
+    c = a == !b;
+    y = 1;
     {
         integer x;
         x = 2;
-        v = x + 1;
+        y = x + 1;
     }
     return x;
 }

@@ -67,7 +67,7 @@ main: {stack = newSymbolTable(stack);} program {tree = $2;};
 
 program:
     var_decl_list {
-        $$ = NULL;
+        $$ = g_node_new(newSymbol());
     }
     | method_decl_list {
         struct Symbol *s = newSymbol();
@@ -94,7 +94,6 @@ var_decl_list:
 
 var_decl:
     type var_list SEMICOLON {
-        // printf("%s%d\n", "PARSER_TYPE: ",$1);
         int i;
         for (i=0; i < g_list_length($2); i++){
             char *name = (char*)g_list_nth_data($2, i);
@@ -103,11 +102,11 @@ var_decl:
             s->name = name;
             s->type = $1;
             if (exists(stack, name) == NULL){
-                // printf("%s%s\n", "PARSER_ID: ",name);
                 stack = insertSymbol(stack, s);
             }
             else {
-                printf("Variable '%s' already exists\n", name);
+                printf("variable '%s' already exists\n", name);
+                exit(0);
             }
         }
         $$ = stack;
@@ -153,9 +152,6 @@ method_decl_list:
 
 method_decl:
     type ID '(' {stack = addLevel(stack);} method_decl_params ')' block {stack = removeLevel(stack);
-        // printf("%s%d\n", "PARSER_TYPE: ",$1);
-        // printf("%s%s\n", "PARSER_ID: ",$2);
-
         char* name = $2;
         struct Symbol *s = newSymbol();
         s->flag = E_FUNC;
@@ -164,11 +160,11 @@ method_decl:
         s->param = $5;
 
         if (exists(stack, name) == NULL){
-            // printf("%s%s\n", "PARSER_ID: ",name);
             stack = insertSymbol(stack, s);
         }
         else {
-            printf("function '%s' already exists\n", name);
+            printf("function '%s' already exists.\n", name);
+            exit(0);
         }
 
         GNode *parent = g_node_new(s);
@@ -176,9 +172,6 @@ method_decl:
         $$ = parent;
     }
     | EXTERN type ID '(' {stack = addLevel(stack);} method_decl_params {stack = removeLevel(stack);} ')' SEMICOLON {
-        // printf("%s%d\n", "PARSER_TYPE: ",$2);
-        // printf("%s%s\n", "PARSER_ID: ",$3);
-
         char* name = $3;
         struct Symbol *s = newSymbol();
         s->flag = E_FUNC;
@@ -187,11 +180,11 @@ method_decl:
         s->param = $6;
 
         if (exists(stack, name) == NULL){
-            // printf("%s%s\n", "PARSER_ID: ",name);
             stack = insertSymbol(stack, s);
         }
         else {
-            printf("function '%s' already exists\n", name);
+            printf("function '%s' already exists.\n", name);
+            exit(0);
         }
 
         GNode *parent = g_node_new(s);
@@ -206,14 +199,12 @@ method_decl_params:
             struct Symbol *s = (struct Symbol *)g_list_nth_data($1, i);
             char *name = s->name;
             enum type type = s->type;
-            // printf("%s%d\n", "PARSER_TYPE: ",type);
-            // printf("%s",toString(s));
             if (exists(stack, name) == NULL){
-                // printf("%s%s\n", "PARSER_ID: ",name);
                 stack = insertSymbol(stack, s);
             }          
             else{
-                printf("Method '%s' already exists\n", name);
+                printf("parameter '%s' already exists.\n", name);
+                exit(0);
             }
         }
         $$ = stack;        
@@ -278,13 +269,20 @@ statement_list:
 
 statement:
     ID ASSIGN_OP expression SEMICOLON {
-        GNode *first_child = g_node_new(findSymbol(stack, $1));
-        struct Symbol *s = newSymbol();
-        s->name = "ASSIGN_OP";
-        GNode *parent = g_node_new(s);
-        g_node_append(parent, first_child);
-        g_node_append(parent, $3);
-        $$ = parent;
+        struct Symbol *r = findSymbol(stack, $1);
+        if (r != NULL) {
+            GNode *first_child = g_node_new(r);
+            struct Symbol *s = newSymbol();
+            s->name = "ASSIGN_OP";
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, first_child);
+            g_node_append(parent, $3);
+            $$ = parent;
+        }
+        else{
+            printf("variable '%s' not defined.\n", $1);
+            exit(0);
+        }
     }
     | RETURN expression SEMICOLON {
         struct Symbol *s = newSymbol();
@@ -311,7 +309,8 @@ expression:
             $$ = g_node_new(s);
         }
         else{
-            printf("variable not defined.");
+            printf("variable '%s' not defined.\n", $1);
+            exit(0);
         }
         
     }
@@ -392,18 +391,15 @@ expression:
 integer_literal:
     INT {
         $$=$1; 
-        // printf("%d\n",$1);
     }
   ;
 
 bool_literal:
     V_TRUE {
         $$=$1; 
-        // printf("%d\n",$1);
     }
     | V_FALSE {
         $$=$1; 
-        // printf("%d\n",$1);
     }
   ;
  

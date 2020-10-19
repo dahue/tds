@@ -28,6 +28,9 @@ SYNA 	= bison
 
 SRCDIR = src
 
+SUCC_TESTS_DIR = tests/success
+FAIL_TESTS_DIR = tests/fail
+
 all: tdsc
 
 tdsc: syntactic_analyzer
@@ -61,11 +64,8 @@ clean:
 	rm -f ${SRCDIR}/syntactic_analyzer.output
 
 test:
-	@echo "Running test1"
-	bin/tdsc tests/test1.tds
-	@echo "Running test2"
-	bin/tdsc tests/test2.tds
-# @echo "Running test3"
-# bin/tdsc tests/test3.txt
-# @echo "Running test4"
-# bin/tdsc tests/test4.txt
+	@echo "Running sucessful tests"
+	@$(foreach x,$(wildcard $(SUCC_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc $(x);)
+
+	@echo "Running fail tests"
+	@$(foreach x,$(wildcard $(FAIL_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc $(x);)

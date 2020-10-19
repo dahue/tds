@@ -151,11 +151,13 @@ semicolon	(";")
 
 . {
     printf("tdsc> lexical error: '%s' in line %d.\n", yytext, yylineno);
+    exit(0);
 }
 
 %%
 
 void yyerror (char *msg) {
   printf("tdsc> %s: '%s' in line %d.\n", msg, yytext, yylineno);
+  exit(0);
 }
 
