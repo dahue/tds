@@ -1,0 +1,42 @@
+integer num_1; //primer numero
+integer num_2;
+
+//metodo comentado
+ /* 
+bool isNeg(integer x){
+  bool result;
+  result= false && false;
+  return true;
+}
+*/
+
+bool isNeg(integer x){
+  bool result;
+  {
+    result= false && !(false && true);
+    //return result;
+  }
+}
+
+extern void hi();
+
+void and(bool b1, bool b2){
+  bool c;
+  {
+    c= (!b1) == b2;
+    //return;
+  }
+  ;
+}
+
+/*
+ integer b;
+*/
+
+void main(){
+  integer num_01;
+  bool p;
+  num_01=9;
+  num_01= ((9 + 8)* 5 +2) +11;
+  //return !p;
+}

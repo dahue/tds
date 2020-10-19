@@ -1,0 +1,7 @@
+integer x;
+integer y;
+bool sum(integer a, integer b){
+  integer result;
+  result= a + b;
+  return result;
+}.

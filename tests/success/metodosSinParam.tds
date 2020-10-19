@@ -1,0 +1,7 @@
+integer metodo1() {
+
+}
+extern void metodo2() ;
+bool metodo3() {
+
+}

@@ -1,0 +1,26 @@
+integer cuadrado(integer aux){
+  integer r;
+  {
+    r= aux * aux;
+  }
+  return r;
+}
+
+bool areNeg(bool aux_1, bool aux_2){
+  return aux_1 && aux_2;
+}
+
+extern void aux(integer b, bool x);
+
+void hi(integer cant, bool saludar){
+  return;
+}
+
+extern integer add(integer x);
+
+void num(integer x){
+  integer b;
+  b= x * (4 + 9) + 8;
+  ;
+}
+

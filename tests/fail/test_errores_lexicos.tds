@@ -1,0 +1,29 @@
+/*
+Este test falla, tiene un error lexico en la linea 5 "@" y en la linea 9 un "#"
+*/
+integer variable;
+integer a@;
+
+//definicion funcion
+integer inc(integer x){
+    return #x + 1;
+}
+
+// definicion procedimiento
+void inc_void(){
+   x= x + 1;
+}
+
+// definicion de funcion externa
+extern integer get_int();
+
+integer main(){
+    integer x;
+    bool a;
+    bool b;
+    bool c;
+    a = true;
+    b = false;
+    c = a && b;
+    c = !b;
+}

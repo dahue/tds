@@ -2,6 +2,8 @@
 Este test es correcto
 */
 integer variable;
+integer z;
+integer x;
 integer a;
 
 //definicion funcion
@@ -11,7 +13,7 @@ integer inc(integer x){
 
 // definicion procedimiento
 void inc_void(){
-    x + 1;
+    z = x + 1;
 }
 
 // definicion de funcion externa
@@ -19,6 +21,7 @@ extern integer get_int();
 
 integer main(){
     integer x;
+    integer y;
     bool a;
     bool b;
     bool c;

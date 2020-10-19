@@ -1,6 +1,8 @@
 %{
+#include <glib.h>
+#include <stdbool.h>
 #include "syntactic_analyzer.h"
-#include "util/verbose.c"
+#include "util/verbose.h"
 %}
 
 %option noyywrap
@@ -60,15 +62,15 @@ semicolon	(";")
 {false}	{ 
     yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
     strcpy(yylval.s,yytext);
-    verbose("FALSE : %s\n",yytext);
-    return FALSE;
+    verbose("V_FALSE : %s\n",yytext);
+    return V_FALSE;
 }
 
 {true} { 
     yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
     strcpy(yylval.s,yytext);
-    verbose("TRUE : %s\n",yytext);
-    return TRUE;
+    verbose("V_TRUE : %s\n",yytext);
+    return V_TRUE;
 }
 
 {extern} { 
@@ -149,10 +151,13 @@ semicolon	(";")
 
 . {
     printf("tdsc> lexical error: '%s' in line %d.\n", yytext, yylineno);
+    exit(0);
 }
 
 %%
 
 void yyerror (char *msg) {
   printf("tdsc> %s: '%s' in line %d.\n", msg, yytext, yylineno);
+  exit(0);
 }
+

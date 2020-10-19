@@ -1,5 +1,6 @@
 # Folders with random stuff
 delete/
+.vscode/
 *.py
 *.output
 # Auto-generated .c files

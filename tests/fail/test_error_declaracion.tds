@@ -1,0 +1,20 @@
+/*
+Este test falla, se intenta declarar la variable y despues de 
+una asignacion. Este test falla, se intenta declarar la variable y despues de
+Este test falla, se intenta declarar la variable y despues de 
+Este test falla, se intenta declarar la variable y despues de 
+Este test falla, se intenta declarar la variable y despues de 
+Este test falla, se intenta declarar la variable y despues de 
+sllfsk,.,.,l,lw+p
+*/
+integer inc(integer x, bool s){
+    return x + 1;
+}
+extern integer get_int();
+
+extern void print_int(integer i);
+
+integer main(){
+    y = 1;
+    integer y;
+}

@@ -1,0 +1,5 @@
+bool b;
+bool isNeg(integer x){
+  return false;
+}
+integer y;
