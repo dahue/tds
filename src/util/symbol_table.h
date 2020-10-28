@@ -3,8 +3,26 @@
 #include <glib.h>
 #include <stdbool.h>
 
-enum flag{EF_INDF, E_ID, E_FUNC, E_PARAM};
-enum type{E_INDF, E_VOID, E_INTEGER, E_BOOL};
+enum flag{
+    F_INDF, 
+    F_ID, 
+    F_FUNC, 
+    F_PARAM, 
+    F_CONST, 
+    F_PLUS_OP, 
+    F_MUL_OP, 
+    F_AND_OP, 
+    F_EQ_OP, 
+    F_NOT_OP, 
+    F_ASSIGN_OP,
+    F_RETURN
+};
+enum type{
+    T_INDF, 
+    T_VOID, 
+    T_INTEGER, 
+    T_BOOL
+};
 
 struct Symbol {
     enum flag flag;
@@ -13,7 +31,7 @@ struct Symbol {
     int value_int;
     bool value_bool;
     GList *param;
-
+    int reg;
 };
 
 struct Symbol *newSymbol();

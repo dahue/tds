@@ -98,7 +98,7 @@ var_decl:
         for (i=0; i < g_list_length($2); i++){
             char *name = (char*)g_list_nth_data($2, i);
             struct Symbol *s = newSymbol();
-            s->flag = E_ID;
+            s->flag = F_ID;
             s->name = name;
             s->type = $1;
             if (exists(stack, name) == NULL){
@@ -125,13 +125,13 @@ var_list:
 
 type:
     INTEGER {
-        $$=E_INTEGER;
+        $$=T_INTEGER;
     }
     | VOID {
-        $$=E_VOID;
+        $$=T_VOID;
     }
     | BOOL {
-        $$=E_BOOL;
+        $$=T_BOOL;
     }
     ;
 
@@ -154,7 +154,7 @@ method_decl:
     type ID '(' {stack = addLevel(stack);} method_decl_params ')' block {stack = removeLevel(stack);
         char* name = $2;
         struct Symbol *s = newSymbol();
-        s->flag = E_FUNC;
+        s->flag = F_FUNC;
         s->name = name;
         s->type = $1;
         s->param = $5;
@@ -174,7 +174,7 @@ method_decl:
     | EXTERN type ID '(' {stack = addLevel(stack);} method_decl_params {stack = removeLevel(stack);} ')' SEMICOLON {
         char* name = $3;
         struct Symbol *s = newSymbol();
-        s->flag = EF_INDF;
+        s->flag = F_INDF;
         s->name = name;
         s->type = $2;
         s->param = $6;
@@ -215,7 +215,7 @@ method_decl_params:
 method_decl_params_list:
     type ID{
         struct Symbol *s = newSymbol();
-        s->flag = E_ID;
+        s->flag = F_ID;
         s->name = $2;
         s->type = $1;
         GList *l = NULL;
@@ -223,7 +223,7 @@ method_decl_params_list:
     }
     | type ID COMMA method_decl_params_list{
         struct Symbol *s = newSymbol();
-        s->flag = E_ID;
+        s->flag = F_ID;
         s->name = $2;
         s->type = $1;
         $$ = g_list_append($4, s);
@@ -274,6 +274,7 @@ statement:
             GNode *first_child = g_node_new(r);
             struct Symbol *s = newSymbol();
             s->name = "ASSIGN_OP";
+            s->flag = F_ASSIGN_OP;
             GNode *parent = g_node_new(s);
             g_node_append(parent, first_child);
             g_node_append(parent, $3);
@@ -287,7 +288,8 @@ statement:
     | RETURN expression SEMICOLON {
         struct Symbol *s = newSymbol();
         s->name = "RETURN";
-        s->type = E_INDF;
+        s->type = T_INDF;
+        s->type = F_RETURN;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $2);
         $$ = parent;
@@ -295,7 +297,7 @@ statement:
     | RETURN SEMICOLON {
         struct Symbol *s = newSymbol();
         s->name = "RETURN";
-        s->type = E_VOID;
+        s->type = T_VOID;
         GNode *parent = g_node_new(s);
         $$ = parent;
     }
@@ -327,8 +329,9 @@ expression:
         int length = snprintf( NULL, 0, "%d", $1 );
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", $1 );
-        s->type = E_INTEGER;
+        s->type = T_INTEGER;
         s->name = str;
+        s->flag = F_CONST;
         s->value_int = $1;
         $$ = g_node_new(s);
     }
@@ -337,15 +340,16 @@ expression:
         int length = snprintf( NULL, 0, "%d", $1 );
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", $1 );
-        s->type = E_BOOL;
+        s->type = T_BOOL;
         s->name = str;
+        s->flag = F_CONST;
         s->value_bool = $1;
         $$ = g_node_new(s);
     }
     | '!' expression {
         struct Symbol *s = newSymbol();
         s->name = "!";
-        s->flag = EF_INDF;
+        s->flag = F_NOT_OP;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $2);
 
@@ -354,7 +358,7 @@ expression:
     | expression AND expression {
         struct Symbol *s = newSymbol();
         s->name = "AND";
-        s->flag = EF_INDF;
+        s->flag = F_AND_OP;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -364,7 +368,7 @@ expression:
     | expression EQUAL expression {
         struct Symbol *s = newSymbol();
         s->name = "EQUAL";
-        s->flag = EF_INDF;
+        s->flag = F_EQ_OP;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -374,7 +378,7 @@ expression:
     | expression '+' expression {
         struct Symbol *s = newSymbol();
         s->name = "+";
-        s->flag = EF_INDF;
+        s->flag = F_PLUS_OP;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -384,7 +388,7 @@ expression:
     | expression '*' expression {
         struct Symbol *s = newSymbol();
         s->name = "*";
-        s->flag = EF_INDF;
+        s->flag = F_MUL_OP;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);

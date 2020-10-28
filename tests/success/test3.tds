@@ -1,0 +1,7 @@
+integer main(){
+    integer x;
+    integer y;
+    integer z;
+    x = x * (1 + 2) + z;
+    return x;
+}
