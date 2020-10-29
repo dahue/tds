@@ -1,0 +1,5 @@
+integer main(){
+    bool y;
+    y = true && 5;
+    return 0;
+}

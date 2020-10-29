@@ -4,6 +4,7 @@
 #include "syntactic_analyzer.c"
 #include "util/verbose.h"
 #include "util/ast.c"
+#include "util/tac.c"
 
 extern FILE * yyin;
 
@@ -30,4 +31,5 @@ int main(int argc,char *argv[]){
 
 	GNode *tree = returnAST();
 	typeCheck(tree);
+	tac(tree);
 }

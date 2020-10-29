@@ -4,5 +4,9 @@ integer calcMax (integer min,integer max){
     return min;
 }
 void toString() {
+    return;
+}
 
+void main(){
+    return;
 }

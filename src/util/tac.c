@@ -1,0 +1,164 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <glib.h>
+#include "symbol_table.h"
+
+int reg_count;
+GList *tac_list;
+
+void load_const(struct Symbol *s){
+    printf("Load_Const %s, R_%d\n", s->name, s->reg);
+}
+
+void load_mem(struct Symbol *s){
+    printf("Load_Mem %s, R_%d\n", s->name, s->reg);
+}
+
+void store_mem(struct Symbol *n, struct Symbol *m){
+    printf("Store_Mem R_%d, %s\n", m->reg, n->name);
+}
+
+void add_reg(struct Symbol *n, struct Symbol *m, struct Symbol *r){
+    printf("Add_Reg R_%d, R_%d, R_%d\n", n->reg, m->reg, r->reg);
+}
+
+void mul_reg(struct Symbol *n, struct Symbol *m, struct Symbol *r){
+    printf("Mul_Reg R_%d, R_%d, R_%d\n", n->reg, m->reg, r->reg);
+}
+
+void and_reg(struct Symbol *n, struct Symbol *m, struct Symbol *r){
+    printf("AND_Reg R_%d, R_%d, R_%d\n", n->reg, m->reg, r->reg);
+}
+
+void eq_reg(struct Symbol *n, struct Symbol *m, struct Symbol *r){
+    printf("EQ_Reg R_%d, R_%d, R_%d\n", n->reg, m->reg, r->reg);
+}
+
+void not_reg(struct Symbol *n, struct Symbol *r){
+    printf("NOT_Reg R_%d, R_%d\n", n->reg, r->reg);
+}
+
+void return_reg(struct Symbol *r){
+    printf("Return_Reg R_%d\n", r->reg);
+}
+
+void end_func(struct Symbol *s){
+    printf("End_func %s\n", s->name);
+}
+
+gboolean tac_generator(GNode *node, gpointer data){
+    struct Symbol *s = node->data;
+    if (s->reg == -1) {
+        switch(s->flag){
+            case F_ASSIGN_OP:
+                tac_list = g_list_append(tac_list, node);
+                break;
+            case F_FUNC:
+                tac_list = g_list_append(tac_list, node);
+                break;
+            case F_CONST:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_ID:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_PLUS_OP:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_MUL_OP:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_AND_OP:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_EQ_OP:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_NOT_OP:
+                s->reg = reg_count;
+                tac_list = g_list_append(tac_list, node);
+                reg_count += 1;
+                break;
+            case F_RETURN:
+                if (s->type != T_VOID){
+                    struct Symbol *l = g_node_nth_child(node, 0)->data;
+                    s->reg = l->reg;
+                    tac_list = g_list_append(tac_list, node);
+                }
+                break;                                                                                                                                
+        }
+    }
+    return false;
+}
+
+void show_tac_list(GList *list) {
+    int i;
+    for (i=0; i < g_list_length(list); i++){
+        GNode *node = g_list_nth_data(list, i);
+        struct Symbol *s = node->data;
+        // printf("%s, R_%d\n", s->name, s->reg);
+        if (s->flag == F_FUNC) {
+            end_func(s);
+        }
+        if (s->flag == F_CONST) {
+            load_const(s);
+        }
+        if (s->flag == F_ID) {
+            load_mem(s);
+        }
+        if (s->flag == F_RETURN) {
+            return_reg(s);
+        }
+        if (s->flag == F_NOT_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            not_reg(l, s);
+        }
+        if (s->flag == F_ASSIGN_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            store_mem(l, r);
+        }
+        if (s->flag == F_PLUS_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            add_reg(l, r, s);
+        }
+        if (s->flag == F_MUL_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            mul_reg(l, r, s);
+        }
+        if (s->flag == F_AND_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            and_reg(l, r, s);
+        }
+        if (s->flag == F_EQ_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            eq_reg(l, r, s);
+        }
+    }
+}
+
+bool tac(GNode* root){
+    printf("\nThree Address Code\n");
+    reg_count = 0;
+    g_node_traverse (root, G_POST_ORDER, G_TRAVERSE_ALL, -1, tac_generator, NULL);
+
+    show_tac_list(tac_list);
+}

@@ -10,8 +10,9 @@ integer inc(integer x){
 }
 
 // definicion procedimiento
-void inc_Void(){
+void inc_Void(integer x){
     x = x + 1;
+    return;
 }
 
 // definicion de funcion externa
@@ -19,6 +20,7 @@ extern integer getInt();
 
 integer main(){
     integer x;
+    integer y;
     bool a;
     bool b;
     bool c;

@@ -20,5 +20,5 @@ integer main(){
         x = 2;
         y = x + 1;
     }
-    return x;
+    return y;
 }

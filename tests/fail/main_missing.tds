@@ -17,14 +17,3 @@ void inc_void(){
 
 // definicion de funcion externa
 extern integer get_int();
-
-integer main(){
-    integer x;
-    bool a;
-    bool b;
-    bool c;
-    a = true;
-    b = false;
-    c = a && b;
-    c = a = !b;
-}

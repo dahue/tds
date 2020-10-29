@@ -1,0 +1,4 @@
+
+bool main(integer a){
+  return true;
+}

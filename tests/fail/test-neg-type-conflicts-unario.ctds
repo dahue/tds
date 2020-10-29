@@ -1,0 +1,6 @@
+bool aux(integer a){
+  return !a;
+}
+void main(){
+  
+}

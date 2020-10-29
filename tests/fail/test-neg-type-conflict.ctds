@@ -1,0 +1,9 @@
+integer x;
+
+integer sum(integer a, bool b){
+  return a + b;
+}
+
+integer main(){
+  return 5;
+}

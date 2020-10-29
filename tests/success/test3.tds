@@ -1,0 +1,9 @@
+integer main(){
+    integer x;
+    integer y;
+    integer z;
+    bool result;
+    result= false && false;
+    x = x * (1 + 2) + z;
+    return x;
+}

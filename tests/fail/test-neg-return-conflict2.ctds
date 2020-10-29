@@ -1,0 +1,5 @@
+integer x;
+
+void hi(integer p){
+  return p;
+}

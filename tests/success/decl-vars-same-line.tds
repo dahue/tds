@@ -1,1 +1,5 @@
 integer aux, aux2, aux_3, x,y;
+
+void main(){
+    return;
+}

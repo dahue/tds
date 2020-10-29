@@ -1,0 +1,9 @@
+
+integer func(){
+  integer x;
+  x=0;
+}
+// functions names duplicated
+bool func(){
+  return true;
+}

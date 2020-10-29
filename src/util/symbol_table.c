@@ -7,8 +7,10 @@
 struct Symbol *newSymbol(){
    struct Symbol* symbol = (struct Symbol*)malloc(sizeof(struct Symbol));
    symbol->name = "e_indf";
-   symbol->flag = EF_INDF;
-   symbol->type = E_INDF;
+   symbol->flag = F_INDF;
+   symbol->type = T_INDF;
+   symbol->reg = -1;
+   symbol->lineno = 0;
    return symbol;
 }
 

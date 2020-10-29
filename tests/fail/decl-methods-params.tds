@@ -22,9 +22,5 @@ void num(integer x){
   integer b;
   b= x * (4 + 9) + 8;
   ;
-  return;
 }
 
-void main(){
-  return;
-}

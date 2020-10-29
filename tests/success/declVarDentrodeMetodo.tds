@@ -3,4 +3,9 @@ void metodo1(){
     bool esMenor;
     integer menor,mayor;
     esMenor = !(menor == mayor);
+    return;
+}
+
+void main(){
+    return;
 }

@@ -10,6 +10,7 @@ extern void print_int(integer i, bool flag, integer z);
 
 integer main(){
     integer y;
+    integer x;
     y = 1;
     {
         integer x;
