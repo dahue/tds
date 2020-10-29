@@ -1,7 +1,11 @@
 integer metodo1() {
-
+    return 0;
 }
 extern void metodo2() ;
 bool metodo3() {
+    return true;
+}
 
+void main(){
+    return;
 }

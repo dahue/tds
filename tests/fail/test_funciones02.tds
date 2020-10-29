@@ -9,10 +9,6 @@ integer inc(integer x){
     return x + 1;
 }
 
-//definicion funcion
-integer inc(integer x){
-    ;
-}
 
 //definicion funcion
 integer factorial(integer x, bool flag){
@@ -23,9 +19,10 @@ integer factorial(integer x, bool flag){
 
 // definicion procedimiento
 void inc_void(){
+    integer x;
     x= x + 1;
     {   }
-    
+    return;
 }
 
 // definicion de funcion externa

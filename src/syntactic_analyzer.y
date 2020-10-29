@@ -101,11 +101,12 @@ var_decl:
             s->flag = F_ID;
             s->name = name;
             s->type = $1;
+            s->lineno = yylineno;
             if (exists(stack, name) == NULL){
                 stack = insertSymbol(stack, s);
             }
             else {
-                printf("variable '%s' already exists\n", name);
+                printf("tdsc> error in line %d: variable '%s' already exists.\n", yylineno, name);
                 exit(0);
             }
         }
@@ -158,12 +159,12 @@ method_decl:
         s->name = name;
         s->type = $1;
         s->param = $5;
-
+        s->lineno = yylineno;
         if (exists(stack, name) == NULL){
             stack = insertSymbol(stack, s);
         }
         else {
-            printf("function '%s' already exists.\n", name);
+            printf("tdsc> error in line %d: function '%s' already exists.\n", yylineno, name);
             exit(0);
         }
 
@@ -178,12 +179,12 @@ method_decl:
         s->name = name;
         s->type = $2;
         s->param = $6;
-
+        s->lineno = yylineno;
         if (exists(stack, name) == NULL){
             stack = insertSymbol(stack, s);
         }
         else {
-            printf("function '%s' already exists.\n", name);
+            printf("tdsc> error in line %d: function '%s' already exists.\n", yylineno, name);
             exit(0);
         }
 
@@ -203,7 +204,7 @@ method_decl_params:
                 stack = insertSymbol(stack, s);
             }          
             else{
-                printf("parameter '%s' already exists.\n", name);
+                printf("tdsc> error in line %d: parameter '%s' already exists.\n", yylineno, name);
                 exit(0);
             }
         }
@@ -218,6 +219,7 @@ method_decl_params_list:
         s->flag = F_ID;
         s->name = $2;
         s->type = $1;
+        s->lineno = yylineno;
         GList *l = NULL;
         $$ = g_list_append(l, s);
     }
@@ -226,6 +228,7 @@ method_decl_params_list:
         s->flag = F_ID;
         s->name = $2;
         s->type = $1;
+        s->lineno = yylineno;
         $$ = g_list_append($4, s);
     }
     ;
@@ -275,13 +278,14 @@ statement:
             struct Symbol *s = newSymbol();
             s->name = "ASSIGN_OP";
             s->flag = F_ASSIGN_OP;
+            s->lineno = yylineno;
             GNode *parent = g_node_new(s);
             g_node_append(parent, first_child);
             g_node_append(parent, $3);
             $$ = parent;
         }
         else{
-            printf("variable '%s' not defined.\n", $1);
+            printf("tdsc> error in line %d: variable '%s' not defined.\n", yylineno, $1);
             exit(0);
         }
     }
@@ -289,7 +293,8 @@ statement:
         struct Symbol *s = newSymbol();
         s->name = "RETURN";
         s->type = T_INDF;
-        s->type = F_RETURN;
+        s->flag = F_RETURN;
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $2);
         $$ = parent;
@@ -298,12 +303,15 @@ statement:
         struct Symbol *s = newSymbol();
         s->name = "RETURN";
         s->type = T_VOID;
+        s->lineno = yylineno;
+        s->flag = F_RETURN;
         GNode *parent = g_node_new(s);
         $$ = parent;
     }
     | SEMICOLON {
         struct Symbol *s = newSymbol();
         s->name = "SEMICOLON";
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         $$ = parent;
     }
@@ -319,7 +327,7 @@ expression:
             $$ = g_node_new(s);
         }
         else{
-            printf("variable '%s' not defined.\n", $1);
+            printf("tdsc> error in line %d: variable '%s' not defined.\n", yylineno, $1);
             exit(0);
         }
         
@@ -333,6 +341,7 @@ expression:
         s->name = str;
         s->flag = F_CONST;
         s->value_int = $1;
+        s->lineno = yylineno;
         $$ = g_node_new(s);
     }
     | bool_literal{
@@ -344,12 +353,14 @@ expression:
         s->name = str;
         s->flag = F_CONST;
         s->value_bool = $1;
+        s->lineno = yylineno;
         $$ = g_node_new(s);
     }
     | '!' expression {
         struct Symbol *s = newSymbol();
         s->name = "!";
         s->flag = F_NOT_OP;
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $2);
 
@@ -359,6 +370,7 @@ expression:
         struct Symbol *s = newSymbol();
         s->name = "AND";
         s->flag = F_AND_OP;
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -369,6 +381,7 @@ expression:
         struct Symbol *s = newSymbol();
         s->name = "EQUAL";
         s->flag = F_EQ_OP;
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -379,6 +392,7 @@ expression:
         struct Symbol *s = newSymbol();
         s->name = "+";
         s->flag = F_PLUS_OP;
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -389,6 +403,7 @@ expression:
         struct Symbol *s = newSymbol();
         s->name = "*";
         s->flag = F_MUL_OP;
+        s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         g_node_append(parent, $3);
@@ -408,10 +423,10 @@ integer_literal:
 
 bool_literal:
     V_TRUE {
-        $$=$1; 
+        $$=true; 
     }
     | V_FALSE {
-        $$=$1; 
+        $$=false; 
     }
   ;
  

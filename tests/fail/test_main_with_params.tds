@@ -1,0 +1,4 @@
+integer main(integer r){
+    integer y;
+    y = 1;
+}

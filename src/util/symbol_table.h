@@ -32,6 +32,7 @@ struct Symbol {
     bool value_bool;
     GList *param;
     int reg;
+    int lineno;
 };
 
 struct Symbol *newSymbol();

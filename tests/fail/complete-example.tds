@@ -39,5 +39,5 @@ void main(){
   bool p;
   num_01=9;
   num_01= ((9 + 8)* 5 +2) +11;
-  return;
+  return !p;
 }

@@ -1,0 +1,8 @@
+
+bool func(){
+  return;
+}
+
+void main(){
+  return;
+}

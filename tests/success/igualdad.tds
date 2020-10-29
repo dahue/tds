@@ -1,0 +1,13 @@
+bool equalsInteger(integer a, integer b){
+  return a == b;
+}
+
+bool equalsBool(bool a, bool b){
+  bool c;
+  c= b == a;
+  return c;
+}
+
+void main(){
+  return;
+}

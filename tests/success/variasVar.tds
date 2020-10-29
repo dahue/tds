@@ -2,3 +2,7 @@ integer x,y,z;
 bool esMayor;
 integer acum;
 bool min,max;
+
+void main(){
+    return;
+}

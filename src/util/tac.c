@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <glib.h>
-#include <assert.h>
 #include "symbol_table.h"
 
 int reg_count;

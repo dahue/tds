@@ -10,6 +10,7 @@ struct Symbol *newSymbol(){
    symbol->flag = F_INDF;
    symbol->type = T_INDF;
    symbol->reg = -1;
+   symbol->lineno = 0;
    return symbol;
 }
 

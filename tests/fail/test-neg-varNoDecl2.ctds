@@ -1,0 +1,10 @@
+
+integer mul(integer a, integer b){
+  integer x;
+  return a * b;
+}
+
+integer sum(integer a, integer b){
+ 
+   {bool x;  x= true && x; } return a + x;
+}

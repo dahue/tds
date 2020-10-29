@@ -1,2 +1,3 @@
 integer aux;
-extern integer suma();
+
+void main(){return;}

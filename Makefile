@@ -64,8 +64,10 @@ clean:
 	rm -f ${SRCDIR}/syntactic_analyzer.output
 
 test:
-	@echo "Running sucessful tests"
+	@echo
+	@echo "##### Running sucessful tests #####"
 	@$(foreach x,$(wildcard $(SUCC_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc $(x);)
 
-	@echo "Running fail tests"
+	@echo
+	@echo "##### Running failing tests #####"
 	@$(foreach x,$(wildcard $(FAIL_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc $(x);)

@@ -1,0 +1,5 @@
+integer main(){
+    integer y;
+    y = true;
+    return y;
+}

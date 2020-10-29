@@ -1,0 +1,8 @@
+
+integer sum(integer a, integer b){
+  return a + b;
+}
+
+integer mult(integer a, integer b){
+  return true;
+}

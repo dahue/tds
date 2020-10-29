@@ -1,0 +1,8 @@
+
+bool andFunction ( bool a, bool b){
+	return a && b;
+}
+
+integer mainly(){
+  	return 45;
+}
