@@ -7,6 +7,7 @@
 
 int reg_count;
 GList *tac_list;
+GList *tac_func;
 
 void load_const(struct Symbol *s){
     printf("Load_Const %s, R_%d\n", s->name, s->reg);
@@ -41,11 +42,20 @@ void not_reg(struct Symbol *n, struct Symbol *r){
 }
 
 void return_reg(struct Symbol *r){
-    printf("Return_Reg R_%d\n", r->reg);
+    if (r->type == T_VOID){
+        printf("Return_Reg %s\n", "VOID");
+    }
+    else{
+        printf("Return_Reg R_%d\n", r->reg);
+    }
+}
+
+void start_func(struct Symbol *s){
+    printf("START_FUNC %s\n", s->name);
 }
 
 void end_func(struct Symbol *s){
-    printf("End_func %s\n", s->name);
+    printf("END_FUNC %s\n", s->name);
 }
 
 gboolean tac_generator(GNode *node, gpointer data){
@@ -53,52 +63,59 @@ gboolean tac_generator(GNode *node, gpointer data){
     if (s->reg == -1) {
         switch(s->flag){
             case F_ASSIGN_OP:
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 break;
             case F_FUNC:
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_prepend(tac_func, node);
+                struct Symbol *a = newSymbol();
+                a->name = s->name;
+                a->flag = F_END_FUNC;
+                tac_func = g_list_append(tac_func, g_node_new(a));
+
+                tac_list = g_list_concat(tac_list, tac_func);
+                tac_func = NULL;
                 break;
             case F_CONST:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_ID:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_PLUS_OP:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_MUL_OP:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_AND_OP:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_EQ_OP:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_NOT_OP:
                 s->reg = reg_count;
-                tac_list = g_list_append(tac_list, node);
+                tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_RETURN:
                 if (s->type != T_VOID){
                     struct Symbol *l = g_node_nth_child(node, 0)->data;
                     s->reg = l->reg;
-                    tac_list = g_list_append(tac_list, node);
                 }
+                tac_func = g_list_append(tac_func, node);
                 break;                                                                                                                                
         }
     }
@@ -112,6 +129,9 @@ void show_tac_list(GList *list) {
         struct Symbol *s = node->data;
         // printf("%s, R_%d\n", s->name, s->reg);
         if (s->flag == F_FUNC) {
+            start_func(s);
+        }
+        if (s->flag == F_END_FUNC) {
             end_func(s);
         }
         if (s->flag == F_CONST) {
@@ -159,6 +179,5 @@ bool tac(GNode* root){
     printf("\nThree Address Code\n");
     reg_count = 0;
     g_node_traverse (root, G_POST_ORDER, G_TRAVERSE_ALL, -1, tac_generator, NULL);
-
     show_tac_list(tac_list);
 }

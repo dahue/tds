@@ -7,6 +7,7 @@ enum flag{
     F_INDF, 
     F_ID, 
     F_FUNC, 
+    F_END_FUNC,
     F_PARAM, 
     F_CONST, 
     F_PLUS_OP, 
