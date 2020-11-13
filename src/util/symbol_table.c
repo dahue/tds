@@ -11,6 +11,7 @@ struct Symbol *newSymbol(){
    symbol->type = T_INDF;
    symbol->reg = -1;
    symbol->lineno = 0;
+   symbol->offset = 0;
    return symbol;
 }
 

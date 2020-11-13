@@ -5,6 +5,7 @@
 #include "util/verbose.h"
 #include "util/ast.c"
 #include "util/tac.c"
+#include "util/asm.c"
 
 extern FILE * yyin;
 
@@ -31,5 +32,7 @@ int main(int argc,char *argv[]){
 
 	GNode *tree = returnAST();
 	typeCheck(tree);
-	tac(tree);
+	// printf("\nThree Address Code\n");
+	GList *three_address_code = tac(tree);
+	generate_assembler_code(three_address_code);
 }
