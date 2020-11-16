@@ -3,6 +3,7 @@ delete/
 .vscode/
 *.py
 *.output
+*.out
 # Auto-generated .c files
 lexical_analyzer.c
 syntactic_analyzer.c

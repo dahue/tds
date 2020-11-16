@@ -119,13 +119,17 @@ gboolean tac_generator(GNode *node, gpointer data){
                 break;
             case F_EQ_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_NOT_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_RETURN:
                 if (s->type != T_VOID){

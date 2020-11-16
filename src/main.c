@@ -11,14 +11,20 @@ extern FILE * yyin;
 
 int main(int argc,char *argv[]){
 	++argv,--argc;
+	char *file_path;
 	if (argc == 1) {
 		yyin = fopen(argv[0],"r");
+		file_path = "o.s";
 	}
-	else if (argc == 2)
+	else if (argc >= 2)
 	{
 		if (strcmp(argv[0], "-v") == 0) {
 			setVerbose(true);
 			yyin = fopen(argv[1],"r");
+		}
+		else if (strcmp(argv[0], "-o") == 0) {
+			file_path = argv[1];
+			yyin = fopen(argv[2],"r");
 		}
 		else{
 			printf("tdsc> '%s' is not a valid argument.", argv[0]);
@@ -34,5 +40,8 @@ int main(int argc,char *argv[]){
 	typeCheck(tree);
 	// printf("\nThree Address Code\n");
 	GList *three_address_code = tac(tree);
-	generate_assembler_code(three_address_code);
+
+	FILE *fp = fopen (file_path, "w");
+	generate_assembler_code(three_address_code, fp);
+	fclose(fp);
 }
