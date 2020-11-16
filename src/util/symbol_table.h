@@ -5,7 +5,8 @@
 
 enum flag{
     F_INDF, 
-    F_ID, 
+    F_ID,
+    F_ID_GLOBAL,
     F_FUNC, 
     F_END_FUNC,
     F_PARAM, 
@@ -34,6 +35,7 @@ struct Symbol {
     GList *param;
     int reg;
     int lineno;
+    int offset;
 };
 
 struct Symbol *newSymbol();

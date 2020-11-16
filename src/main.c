@@ -5,18 +5,30 @@
 #include "util/verbose.h"
 #include "util/ast.c"
 #include "util/tac.c"
+#include "util/asm.c"
 
 extern FILE * yyin;
 
 int main(int argc,char *argv[]){
 	++argv,--argc;
+	char *file_path;
+	int skip = 0;
 	if (argc == 1) {
 		yyin = fopen(argv[0],"r");
+		file_path = "o.s";
 	}
-	else if (argc == 2)
+	else if (argc >= 2)
 	{
 		if (strcmp(argv[0], "-v") == 0) {
 			setVerbose(true);
+			yyin = fopen(argv[1],"r");
+		}
+		else if (strcmp(argv[0], "-o") == 0) {
+			file_path = argv[1];
+			yyin = fopen(argv[2],"r");
+		}
+		else if (strcmp(argv[0], "-s") == 0) {
+			skip = 1;
 			yyin = fopen(argv[1],"r");
 		}
 		else{
@@ -31,5 +43,12 @@ int main(int argc,char *argv[]){
 
 	GNode *tree = returnAST();
 	typeCheck(tree);
-	tac(tree);
+	// printf("\nThree Address Code\n");
+	GList *three_address_code = tac(tree);
+
+	if (skip != 1){
+		FILE *fp = fopen (file_path, "w");
+		generate_assembler_code(three_address_code, fp);
+		fclose(fp);
+	}
 }

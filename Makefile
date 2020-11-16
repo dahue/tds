@@ -66,8 +66,8 @@ clean:
 test:
 	@echo
 	@echo "##### Running sucessful tests #####"
-	@$(foreach x,$(wildcard $(SUCC_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc $(x);)
+	@$(foreach x,$(wildcard $(SUCC_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc -s $(x);)
 
 	@echo
 	@echo "##### Running failing tests #####"
-	@$(foreach x,$(wildcard $(FAIL_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc $(x);)
+	@$(foreach x,$(wildcard $(FAIL_TESTS_DIR)/*), echo ${\n}; echo $(x); bin/tdsc -s $(x);)

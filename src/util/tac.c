@@ -6,6 +6,7 @@
 #include "symbol_table.h"
 
 int reg_count;
+int offset;
 GList *tac_list;
 GList *tac_func;
 
@@ -70,45 +71,65 @@ gboolean tac_generator(GNode *node, gpointer data){
                 struct Symbol *a = newSymbol();
                 a->name = s->name;
                 a->flag = F_END_FUNC;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, g_node_new(a));
-
                 tac_list = g_list_concat(tac_list, tac_func);
                 tac_func = NULL;
+                offset = 8;
                 break;
             case F_CONST:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_ID:
+                s->reg = reg_count;
+                s->offset = offset;
+                tac_func = g_list_append(tac_func, node);
+                reg_count += 1;
+                offset += 8;
+                break;
+            case F_ID_GLOBAL:
                 s->reg = reg_count;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
                 break;
             case F_PLUS_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_MUL_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_AND_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_EQ_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_NOT_OP:
                 s->reg = reg_count;
+                s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
                 reg_count += 1;
+                offset += 8;
                 break;
             case F_RETURN:
                 if (s->type != T_VOID){
@@ -137,7 +158,7 @@ void show_tac_list(GList *list) {
         if (s->flag == F_CONST) {
             load_const(s);
         }
-        if (s->flag == F_ID) {
+        if ((s->flag == F_ID) || (s->flag == F_ID_GLOBAL)) {
             load_mem(s);
         }
         if (s->flag == F_RETURN) {
@@ -175,9 +196,10 @@ void show_tac_list(GList *list) {
     }
 }
 
-bool tac(GNode* root){
-    printf("\nThree Address Code\n");
+GList* tac(GNode* root){
     reg_count = 0;
+    offset = 8;
     g_node_traverse (root, G_POST_ORDER, G_TRAVERSE_ALL, -1, tac_generator, NULL);
-    show_tac_list(tac_list);
+    // show_tac_list(tac_list);
+    return tac_list;
 }

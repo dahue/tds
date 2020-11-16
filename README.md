@@ -21,14 +21,16 @@ make
 make test
 ```
 
- - El archivo ejecutable quedará guardado en la carpeta bin/. Para ejecutar los tests en modo verbose usar '-v':
-
-```
-bin/tdsc -v tests/success/test1.txt
-```
-
  - Para eliminar los archivos de codigo generado y el archivo binario:
 
 ```
 make clean
 ```
+
+ - El archivo ejecutable quedará guardado en la carpeta bin/. Para ejecutar el compilador:
+
+```
+bin/tdsc -o path_to_output_file.s path_to_source_file.tds
+```
+Nota: Si no se define un archivo de salida se creará un archivo "o.s" en la carpeta corriente con el código assembler.
+

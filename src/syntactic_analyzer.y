@@ -98,7 +98,13 @@ var_decl:
         for (i=0; i < g_list_length($2); i++){
             char *name = (char*)g_list_nth_data($2, i);
             struct Symbol *s = newSymbol();
-            s->flag = F_ID;
+            int stack_level = g_list_length(stack);
+            if (stack_level == 1){
+                s->flag = F_ID_GLOBAL;
+            }
+            else{
+                s->flag = F_ID;
+            }
             s->name = name;
             s->type = $1;
             s->lineno = yylineno;
