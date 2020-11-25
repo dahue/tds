@@ -29,6 +29,11 @@ extern int yylineno;
 %token<s> VOID
 %token<s> INTEGER
 %token<s> BOOL
+%token IF
+%token THEN
+%token ELSE
+%token WHILE
+%token LESS
 %token EXTERN
 %token RETURN
 %token EQUAL
@@ -56,6 +61,7 @@ extern int yylineno;
 %type<n> program
 
 %left AND
+%nonassoc LESS
 %nonassoc EQUAL
 %left '+' 
 %left '*'
@@ -214,15 +220,18 @@ method_decl_params:
                 exit(0);
             }
         }
-        $$ = stack;        
+        $$ = $1;        
     }
-    | {$$ = stack;}
+    | {
+        GList *l;
+        $$ = l;
+    }
     ;
 
 method_decl_params_list:
     type ID{
         struct Symbol *s = newSymbol();
-        s->flag = F_ID;
+        s->flag = F_ID_PARAM;
         s->name = $2;
         s->type = $1;
         s->lineno = yylineno;
@@ -231,7 +240,7 @@ method_decl_params_list:
     }
     | type ID COMMA method_decl_params_list{
         struct Symbol *s = newSymbol();
-        s->flag = F_ID;
+        s->flag = F_ID_PARAM;
         s->name = $2;
         s->type = $1;
         s->lineno = yylineno;
@@ -266,6 +275,7 @@ statement_list:
     statement {
         struct Symbol *s = newSymbol();
         s->name = "STATEMENT_LIST";
+        s->flag = F_STATEMENT_LIST;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);
         $$ = parent;
@@ -321,8 +331,105 @@ statement:
         GNode *parent = g_node_new(s);
         $$ = parent;
     }
+    | IF '(' expression ')' THEN block {
+        struct Symbol *s = newSymbol();
+        s->name = "IF";
+        s->type = T_INDF;
+        s->flag = F_IF;
+        s->lineno = yylineno;
+        GNode *parent = g_node_new(s);
+        g_node_append(parent, $3);
+        g_node_append(parent, $6);
+        $$ = parent;
+    }
+    | IF '(' expression ')' THEN block ELSE block {
+        struct Symbol *s = newSymbol();
+        s->name = "IF_ELSE";
+        s->type = T_INDF;
+        s->flag = F_IF_ELSE;
+        s->lineno = yylineno;
+        GNode *parent = g_node_new(s);
+        g_node_append(parent, $3);
+        g_node_append(parent, $6);
+        g_node_append(parent, $8);
+        $$ = parent;
+    }
+    | WHILE '(' expression ')' block {
+        struct Symbol *s = newSymbol();
+        s->name = "WHILE";
+        s->type = T_INDF;
+        s->flag = F_WHILE;
+        s->lineno = yylineno;
+        GNode *parent = g_node_new(s);
+        g_node_append(parent, $3);
+        g_node_append(parent, $5);
+        $$ = parent;
+    }
     | block {
         $$ = $1;
+    }
+    | ID '(' ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        if (r != NULL) {
+            GList *param;
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
+    | ID '(' ID ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        struct Symbol *t = findSymbol(stack, $3);
+        if ((r != NULL) && (t != NULL)) {
+            GList *param;
+            param = g_list_append(param, t);
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
+    | ID '(' ID COMMA ID ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        struct Symbol *t = findSymbol(stack, $3);
+        struct Symbol *u = findSymbol(stack, $5);
+        if ((r != NULL) && (t != NULL) && (u != NULL)) {
+            GList *param;
+            param = g_list_append(param, t);
+            param = g_list_append(param, u);
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
     }
   ;
 
@@ -336,7 +443,69 @@ expression:
             printf("tdsc> error in line %d: variable '%s' not defined.\n", yylineno, $1);
             exit(0);
         }
-        
+    }
+    | ID '(' ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        if (r != NULL) {
+            GList *param;
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
+    | ID '(' ID ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        struct Symbol *t = findSymbol(stack, $3);
+        if ((r != NULL) && (t != NULL)) {
+            GList *param;
+            param = g_list_append(param, t);
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
+    | ID '(' ID COMMA ID ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        struct Symbol *t = findSymbol(stack, $3);
+        struct Symbol *u = findSymbol(stack, $5);
+        if ((r != NULL) && (t != NULL) && (u != NULL)) {
+            GList *param;
+            param = g_list_append(param, t);
+            param = g_list_append(param, u);
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
     }
     | integer_literal{
         struct Symbol *s = newSymbol();
@@ -387,6 +556,17 @@ expression:
         struct Symbol *s = newSymbol();
         s->name = "EQUAL";
         s->flag = F_EQ_OP;
+        s->lineno = yylineno;
+        GNode *parent = g_node_new(s);
+        g_node_append(parent, $1);
+        g_node_append(parent, $3);
+
+        $$ = parent;
+    }
+    | expression LESS expression {
+        struct Symbol *s = newSymbol();
+        s->name = "LESS";
+        s->flag = F_LESS_OP;
         s->lineno = yylineno;
         GNode *parent = g_node_new(s);
         g_node_append(parent, $1);

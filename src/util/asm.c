@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "symbol_table.h"
 
+int id;
+
 char *gen_header(GList *list, FILE *fp){
     fprintf(fp, "\t.data\n");
     int i;
@@ -9,7 +11,7 @@ char *gen_header(GList *list, FILE *fp){
         GNode *node = g_list_nth_data(list, i);
         struct Symbol *s = node->data;
         if (s->flag == F_ID_GLOBAL) {
-            fprintf(fp, "%s:\t.long\t0\n", s->name);
+            fprintf(fp, "%s:\t.quad\t0\n", s->name);
         }
     }
 }
@@ -54,6 +56,27 @@ char* gen_load_mem(struct Symbol *s, FILE *fp){
             fprintf(fp, "\tmovq\t$%d, -%d(%%rbp)\n", s->value_bool, s->offset);
         }
     }
+}
+
+char* gen_load_mem_param(GList *l, FILE *fp){
+    if (g_list_length(l) == 1) {
+        struct Symbol *s = g_list_nth_data(l, 0);
+        fprintf(fp, "\tmovq\t%%rdi, -%d(%%rbp)\n", s->offset);
+    }
+    else if (g_list_length(l) == 2) { 
+        struct Symbol *s = g_list_nth_data(l, 0);
+        struct Symbol *t = g_list_nth_data(l, 1);
+        fprintf(fp, "\tmovq\t%%rdi, -%d(%%rbp)\n", t->offset);
+        fprintf(fp, "\tmovq\t%%rsi, -%d(%%rbp)\n", s->offset);
+    }
+    // if (s->flag == F_ID_PARAM){
+    //     if (s->type == T_INTEGER){
+    //         fprintf(fp, "\tmovq\t$%d, -%d(%%rbp)\n", s->value_int, s->offset);
+    //     }
+    //     else{
+    //         fprintf(fp, "\tmovq\t$%d, -%d(%%rbp)\n", s->value_bool, s->offset);
+    //     }
+    // }
 }
 
 char* gen_store_mem(struct Symbol *l, struct Symbol *r, FILE *fp){
@@ -225,12 +248,76 @@ char* gen_eq_reg(struct Symbol *l, struct Symbol *r, struct Symbol *s, FILE *fp)
         fprintf(fp, 
             "\tcmpq\t-%d(%%rbp), %%rax\n", l->offset);
     }
-    fprintf(fp,"\tje\tequal_%d\n\tjmp\tnotequal_%d\n", s->offset, s->offset);
-    fprintf(fp,"equal_%d:\n\tmovq\t$1, -%d(%%rbp)\n\tjmp\tcontinue_%d\n", s->offset, s->offset, s->offset);
-    fprintf(fp,"notequal_%d:\n\tmovq\t$0, -%d(%%rbp)\ncontinue_%d:\n", s->offset, s->offset, s->offset);
+    fprintf(fp,"\tje\tequal_%d\n\tjmp\tnotequal_%d\n", id, id);
+    fprintf(fp,"equal_%d:\n\tmovq\t$1, -%d(%%rbp)\n\tjmp\tcontinue_%d\n", id, s->offset, id);
+    fprintf(fp,"notequal_%d:\n\tmovq\t$0, -%d(%%rbp)\ncontinue_%d:\n", id, s->offset, id);
+    id = id + 1;
+}
+
+char* gen_less_reg(struct Symbol *l, struct Symbol *r, struct Symbol *s, FILE *fp){
+    if (r->flag == F_ID_GLOBAL) {
+        if (l->offset == 0){
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rax\n", l->name);
+        }
+        else{
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rax\n", l->offset);
+        }
+        fprintf(fp, "\tcmpq\t%s(%%rip), %%rax\n", r->name);
+    }
+    else{
+        if (l->offset == 0){
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rax\n", l->name);
+        }
+        else {
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rax\n", l->offset);
+        }
+        fprintf(fp, 
+            "\tcmpq\t-%d(%%rbp), %%rax\n", r->offset);
+    }
+    fprintf(fp,"\tjl\tless_%d\n\tjmp\tnotless_%d\n", id, id);
+    fprintf(fp,"less_%d:\n\tmovq\t$1, -%d(%%rbp)\n\tjmp\tcontinue_%d\n", id, s->offset, id);
+    fprintf(fp,"notless_%d:\n\tmovq\t$0, -%d(%%rbp)\ncontinue_%d:\n", id, s->offset, id);
+    id = id + 1;
+}
+
+char* gen_call_func(struct Symbol *s, FILE *fp){
+    if (g_list_length(s->param) == 0){
+        fprintf(fp, "\tcall\t%s\n", s->name);
+        fprintf(fp, "\tmovq\t%%rax, -%d(%%rbp)\n", s->offset);
+    }
+    else if (g_list_length(s->param) == 1){
+        struct Symbol *x = (struct Symbol *)g_list_nth_data(s->param, 0);
+        if (x->flag == F_ID_GLOBAL) {
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rdi\n", x->name);
+        }
+        else{
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rdi\n", x->offset);
+        }
+        fprintf(fp, "\tcall\t%s\n", s->name);
+        fprintf(fp, "\tmovq\t%%rax, -%d(%%rbp)\n", s->offset);
+    }
+    else if (g_list_length(s->param) == 2){
+        struct Symbol *x = (struct Symbol *)g_list_nth_data(s->param, 0);
+        struct Symbol *y = (struct Symbol *)g_list_nth_data(s->param, 1);
+        if (x->flag == F_ID_GLOBAL) {
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rdi\n", x->name);
+        }
+        else{
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rdi\n", x->offset);
+        }
+        if (y->flag == F_ID_GLOBAL) {
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rsi\n", y->name);
+        }
+        else{
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rsi\n", y->offset);
+        }     
+        fprintf(fp, "\tcall\t%s\n", s->name);
+        fprintf(fp, "\tmovq\t%%rax, -%d(%%rbp)\n", s->offset);
+    }
 }
 
 void generate_assembler_code(GList *list, FILE *fp) {
+    id = 0;
     gen_header(list, fp);
     int i;
     for (i=0; i < g_list_length(list); i++){
@@ -238,6 +325,7 @@ void generate_assembler_code(GList *list, FILE *fp) {
         struct Symbol *s = node->data;
         if (s->flag == F_FUNC) {
             gen_start_func(s, fp);
+            gen_load_mem_param(s->param, fp);
         }
         if (s->flag == F_END_FUNC) {
             gen_end_func(s, fp);
@@ -283,6 +371,14 @@ void generate_assembler_code(GList *list, FILE *fp) {
             struct Symbol *l = g_node_nth_child(node, 0)->data;
             struct Symbol *r = g_node_nth_child(node, 1)->data;
             gen_eq_reg(l, r, s, fp);
+        }
+        if (s->flag == F_LESS_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            gen_less_reg(l, r, s, fp);
+        }
+        if (s->flag == F_FUNC_CALL) {
+            gen_call_func(s, fp);
         }
     }
 }

@@ -16,8 +16,13 @@ true        ("true")
 extern      ("extern")
 return      ("return")
 void        ("void")
+if          ("if")
+then        ("then")
+else        ("else")
+while        ("while")
 and			("&&")
 equal		("==")
+less        ("<")
 assign_op 	("=")
 alpha 		[a-zA-Z]
 digit 		[0-9]
@@ -94,11 +99,46 @@ semicolon	(";")
     return VOID;
 }
 
+{if} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("IF : %s\n",yytext);
+    return IF;
+}
+
+{then} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("THEN : %s\n",yytext);
+    return THEN;
+}
+
+{else} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("ELSE : %s\n",yytext);
+    return ELSE;
+}
+
+{while} { 
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("WHILE : %s\n",yytext);
+    return WHILE;
+}
+
 {equal} {
     yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
     strcpy(yylval.s,yytext);
     verbose("EQUAL : %s\n",yytext);
     return EQUAL;
+}
+
+{less} {
+    yylval.s=(char *) malloc(sizeof(yytext)*yyleng);
+    strcpy(yylval.s,yytext);
+    verbose("LESS : %s\n",yytext);
+    return LESS;
 }
 
 {and} {
