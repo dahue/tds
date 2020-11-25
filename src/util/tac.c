@@ -10,6 +10,8 @@ int offset;
 GList *tac_list;
 GList *tac_func;
 
+GList *if_list;
+
 void load_const(struct Symbol *s){
     printf("Load_Const %s, R_%d\n", s->name, s->reg);
 }
@@ -42,6 +44,10 @@ void not_reg(struct Symbol *n, struct Symbol *r){
     printf("NOT_Reg R_%d, R_%d\n", n->reg, r->reg);
 }
 
+void less_reg(struct Symbol *n, struct Symbol *m, struct Symbol *r){
+    printf("LESS_Reg R_%d, R_%d, R_%d\n", n->reg, m->reg, r->reg);
+}
+
 void return_reg(struct Symbol *r){
     if (r->type == T_VOID){
         printf("Return_Reg %s\n", "VOID");
@@ -58,6 +64,10 @@ void start_func(struct Symbol *s){
 void end_func(struct Symbol *s){
     printf("END_FUNC %s\n", s->name);
 }
+
+// void if_stmt(struct Symbol *c, struct Symbol *t, struct Symbol *s){
+//     printf("IF_cond R_%d, R_%d\n", c->reg, s->reg);
+// }
 
 gboolean tac_generator(GNode *node, gpointer data){
     struct Symbol *s = node->data;
@@ -137,7 +147,27 @@ gboolean tac_generator(GNode *node, gpointer data){
                     s->reg = l->reg;
                 }
                 tac_func = g_list_append(tac_func, node);
-                break;                                                                                                                                
+                break;
+            case F_LESS_OP:
+                s->reg = reg_count;
+                s->offset = offset;
+                struct Symbol *parent_symbol = (node->parent)->data;
+                if ((parent_symbol->flag == F_IF) && (parent_symbol->flag == F_IF_ELSE)) {
+                    if_list = g_list_append(if_list, node);
+                }
+                else{
+                    tac_func = g_list_append(tac_func, node);
+                }
+                reg_count += 1;
+                offset += 8;
+                break;
+            // case F_IF:
+            //     s->reg = reg_count;
+            //     s->offset = offset;
+            //     tac_func = g_list_append(tac_func, node);
+            //     reg_count += 1;
+            //     offset += 8;
+            //     break;
         }
     }
     return false;
@@ -193,6 +223,16 @@ void show_tac_list(GList *list) {
             struct Symbol *r = g_node_nth_child(node, 1)->data;
             eq_reg(l, r, s);
         }
+        if (s->flag == F_LESS_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            less_reg(l, r, s);
+        }
+        // if (s->flag == F_IF) {
+        //     struct Symbol *c = g_node_nth_child(node, 0)->data;
+        //     struct Symbol *t = g_node_nth_child(node, 1)->data;
+        //     if_stmt(c, t, s);
+        // }
     }
 }
 
@@ -200,6 +240,6 @@ GList* tac(GNode* root){
     reg_count = 0;
     offset = 8;
     g_node_traverse (root, G_POST_ORDER, G_TRAVERSE_ALL, -1, tac_generator, NULL);
-    // show_tac_list(tac_list);
+    show_tac_list(tac_list);
     return tac_list;
 }

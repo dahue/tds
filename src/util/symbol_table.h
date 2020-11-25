@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 enum flag{
+    F_STATEMENT_LIST,
     F_INDF, 
     F_ID,
     F_ID_GLOBAL,
@@ -17,7 +18,12 @@ enum flag{
     F_EQ_OP, 
     F_NOT_OP, 
     F_ASSIGN_OP,
-    F_RETURN
+    F_RETURN,
+    F_LESS_OP,
+    F_IF,
+    F_IF_ELSE,
+    F_WHILE,
+    F_FUNC_CALL
 };
 enum type{
     T_INDF, 

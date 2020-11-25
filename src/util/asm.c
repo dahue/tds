@@ -230,6 +230,31 @@ char* gen_eq_reg(struct Symbol *l, struct Symbol *r, struct Symbol *s, FILE *fp)
     fprintf(fp,"notequal_%d:\n\tmovq\t$0, -%d(%%rbp)\ncontinue_%d:\n", s->offset, s->offset, s->offset);
 }
 
+char* gen_less_reg(struct Symbol *l, struct Symbol *r, struct Symbol *s, FILE *fp){
+    if (r->flag == F_ID_GLOBAL) {
+        if (l->offset == 0){
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rax\n", l->name);
+        }
+        else{
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rax\n", l->offset);
+        }
+        fprintf(fp, "\tcmpq\t%s(%%rip), %%rax\n", r->name);
+    }
+    else{
+        if (l->offset == 0){
+            fprintf(fp, "\tmovq\t%s(%%rip), %%rax\n", l->name);
+        }
+        else {
+            fprintf(fp, "\tmovq\t-%d(%%rbp), %%rax\n", l->offset);
+        }
+        fprintf(fp, 
+            "\tcmpq\t-%d(%%rbp), %%rax\n", r->offset);
+    }
+    fprintf(fp,"\tjl\tless_%d\n\tjmp\tnotless_%d\n", s->offset, s->offset);
+    fprintf(fp,"less_%d:\n\tmovq\t$1, -%d(%%rbp)\n\tjmp\tcontinue_%d\n", s->offset, s->offset, s->offset);
+    fprintf(fp,"notless_%d:\n\tmovq\t$0, -%d(%%rbp)\ncontinue_%d:\n", s->offset, s->offset, s->offset);
+}
+
 void generate_assembler_code(GList *list, FILE *fp) {
     gen_header(list, fp);
     int i;
@@ -283,6 +308,11 @@ void generate_assembler_code(GList *list, FILE *fp) {
             struct Symbol *l = g_node_nth_child(node, 0)->data;
             struct Symbol *r = g_node_nth_child(node, 1)->data;
             gen_eq_reg(l, r, s, fp);
+        }
+        if (s->flag == F_LESS_OP) {
+            struct Symbol *l = g_node_nth_child(node, 0)->data;
+            struct Symbol *r = g_node_nth_child(node, 1)->data;
+            gen_less_reg(l, r, s, fp);
         }
     }
 }

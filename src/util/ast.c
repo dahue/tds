@@ -8,6 +8,7 @@
 enum type func_type;
 int return_count;
 int main_count;
+GList *visited;
 
 void error(char *msg, int lineno){
     printf("tdsc> error in line %d. %s.\n", lineno, msg);
@@ -67,10 +68,34 @@ gboolean post_order_analysis (GNode *node, gpointer data){
                 s->type = l->type;
             }
             break;
+        case F_LESS_OP:
+            l = g_node_nth_child(node, 0)->data;
+            r = g_node_nth_child(node, 1)->data;
+            cond = (l->type == r->type);
+            cond ? : error("types don't match", s->lineno);
+            s->type = T_BOOL;
+            break;
+        case F_IF:
+            l = g_node_nth_child(node, 0)->data;
+            cond = (l->type == T_BOOL);
+            cond ? : error("type error, condition not boolean", s->lineno);
+            s->type = T_BOOL;
+            break;
+        case F_IF_ELSE:
+            l = g_node_nth_child(node, 0)->data;
+            cond = (l->type == T_BOOL);
+            cond ? : error("type error, condition not boolean", s->lineno);
+            s->type = T_BOOL;
+            break;
+        
     }
     // printf("node: %s, flag: %d, type %d\n", s->name, s->flag, s->type);
     return false;
 }
+
+/*
+    F_WHILE,
+*/
 
 gboolean symcmp (GNode *node, gpointer data){
     struct Symbol *s = node->data;
@@ -88,7 +113,10 @@ gboolean pre_order_analysis (GNode *node, gpointer data){
     // printf("node: %s, flag: %d, type %d\n", s->name, s->flag, s->type);
     switch(s->flag){
         case F_FUNC:
-            // printf("node: %s, flag: %d, type %d\n", s->name, s->flag, s->type);
+            // if (g_list_find(visited, s) != NULL){
+            //     break;
+            // }
+            // printf("node: %s, flag: %d, type %d, visited %p\n", s->name, s->flag, s->type, g_list_find(visited, s));
             if (strcmp(s->name, "main") == 0){
                 cond = (g_hash_table_size((GHashTable*)((GList*)s->param)->data) == 0);
                 cond ? : error("parameters are not allowed in main method", s->lineno);
@@ -101,6 +129,7 @@ gboolean pre_order_analysis (GNode *node, gpointer data){
             cond = (return_count > 0);
             cond ? : error("return statement missing", s->lineno);
             func_type = s->type;
+            visited = g_list_append(visited, s);
             break;
         case F_RETURN:
             // printf("node: %s, flag: %d, type %d, function type %d\n", s->name, s->flag, s->type, func_type);
