@@ -87,9 +87,25 @@ gboolean post_order_analysis (GNode *node, gpointer data){
             cond ? : error("type error, condition not boolean", s->lineno);
             s->type = T_BOOL;
             break;
-        
+        case F_FUNC_CALL:
+            l = g_node_nth_child(node, 0)->data;
+            cond = (g_list_length(l->param) == g_list_length(s->param));
+            cond ? : error("wrong number of parameters", s->lineno);
+
+            cond = (g_list_length(s->param) <= 2);
+            cond ? : error("too many parameters", s->lineno);
+
+            int i;
+            for (i=0; i < g_list_length(l->param); i++){
+                struct Symbol *x = (struct Symbol *)g_list_nth_data(l->param, i);
+                struct Symbol *y = (struct Symbol *)g_list_nth_data(l->param, i);
+                cond = (x->type == y->type);
+                cond ? : error("parameters types don't match", s->lineno);
+            }
+            node->children = NULL;
+            break;
     }
-    // printf("node: %s, flag: %d, type %d\n", s->name, s->flag, s->type);
+    // printf("node: %s, flag: %d, type %d\n", s->name, s->flag, s->type); 
     return false;
 }
 
@@ -100,6 +116,7 @@ gboolean post_order_analysis (GNode *node, gpointer data){
 gboolean symcmp (GNode *node, gpointer data){
     struct Symbol *s = node->data;
     struct Symbol *r = (struct Symbol*)data;
+    // printf("%s, %s\n", s->name, r->name);
     if (strcmp(s->name, r->name) == 0){
         return_count += 1;
         return true;
@@ -113,12 +130,13 @@ gboolean pre_order_analysis (GNode *node, gpointer data){
     // printf("node: %s, flag: %d, type %d\n", s->name, s->flag, s->type);
     switch(s->flag){
         case F_FUNC:
-            // if (g_list_find(visited, s) != NULL){
-            //     break;
-            // }
+            if (g_list_find(visited, s) != NULL){
+                break;
+            }
             // printf("node: %s, flag: %d, type %d, visited %p\n", s->name, s->flag, s->type, g_list_find(visited, s));
             if (strcmp(s->name, "main") == 0){
-                cond = (g_hash_table_size((GHashTable*)((GList*)s->param)->data) == 0);
+                // cond = (g_hash_table_size((GHashTable*)((GList*)s->param)->data) == 0);
+                cond = (g_list_length(s->param) == 0);
                 cond ? : error("parameters are not allowed in main method", s->lineno);
                 main_count += 1;
             }

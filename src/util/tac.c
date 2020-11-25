@@ -8,6 +8,8 @@
 int reg_count;
 int offset;
 GList *tac_list;
+
+// GList *statement_list;
 GList *tac_func;
 
 GList *if_list;
@@ -65,6 +67,20 @@ void end_func(struct Symbol *s){
     printf("END_FUNC %s\n", s->name);
 }
 
+void call_func(struct Symbol *s){
+    if (g_list_length(s->param) == 0){
+        printf("CALL_FUNC %s, R_%d\n", s->name, s->reg);
+    }
+    else if (g_list_length(s->param) == 1){
+        struct Symbol *x = (struct Symbol *)g_list_nth_data(s->param, 0);
+        printf("CALL_FUNC %s, %s, R_%d\n", s->name, x->name, s->reg);
+    }
+    else if (g_list_length(s->param) == 2){
+        struct Symbol *x = (struct Symbol *)g_list_nth_data(s->param, 0);
+        struct Symbol *y = (struct Symbol *)g_list_nth_data(s->param, 1);
+        printf("CALL_FUNC %s, %s, %s, R_%d\n", s->name, x->name, y->name, s->reg);
+    }
+}
 // void if_stmt(struct Symbol *c, struct Symbol *t, struct Symbol *s){
 //     printf("IF_cond R_%d, R_%d\n", c->reg, s->reg);
 // }
@@ -95,6 +111,13 @@ gboolean tac_generator(GNode *node, gpointer data){
                 offset += 8;
                 break;
             case F_ID:
+                s->reg = reg_count;
+                s->offset = offset;
+                tac_func = g_list_append(tac_func, node);
+                reg_count += 1;
+                offset += 8;
+                break;
+            case F_ID_PARAM:
                 s->reg = reg_count;
                 s->offset = offset;
                 tac_func = g_list_append(tac_func, node);
@@ -161,6 +184,13 @@ gboolean tac_generator(GNode *node, gpointer data){
                 reg_count += 1;
                 offset += 8;
                 break;
+            case F_FUNC_CALL:
+                s->reg = reg_count;
+                s->offset = offset;// + 8 * g_list_length(s->param);
+                tac_func = g_list_append(tac_func, node);
+                reg_count += 1;
+                offset += 8;// + 8 * g_list_length(s->param);
+                break;
             // case F_IF:
             //     s->reg = reg_count;
             //     s->offset = offset;
@@ -188,7 +218,7 @@ void show_tac_list(GList *list) {
         if (s->flag == F_CONST) {
             load_const(s);
         }
-        if ((s->flag == F_ID) || (s->flag == F_ID_GLOBAL)) {
+        if ((s->flag == F_ID) || (s->flag == F_ID_GLOBAL) || (s->flag == F_ID_PARAM)) {
             load_mem(s);
         }
         if (s->flag == F_RETURN) {
@@ -228,6 +258,9 @@ void show_tac_list(GList *list) {
             struct Symbol *r = g_node_nth_child(node, 1)->data;
             less_reg(l, r, s);
         }
+        if (s->flag == F_FUNC_CALL) {
+            call_func(s);
+        }
         // if (s->flag == F_IF) {
         //     struct Symbol *c = g_node_nth_child(node, 0)->data;
         //     struct Symbol *t = g_node_nth_child(node, 1)->data;
@@ -240,6 +273,6 @@ GList* tac(GNode* root){
     reg_count = 0;
     offset = 8;
     g_node_traverse (root, G_POST_ORDER, G_TRAVERSE_ALL, -1, tac_generator, NULL);
-    show_tac_list(tac_list);
+    // show_tac_list(tac_list);
     return tac_list;
 }

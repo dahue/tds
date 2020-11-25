@@ -220,15 +220,18 @@ method_decl_params:
                 exit(0);
             }
         }
-        $$ = stack;        
+        $$ = $1;        
     }
-    | {$$ = stack;}
+    | {
+        GList *l;
+        $$ = l;
+    }
     ;
 
 method_decl_params_list:
     type ID{
         struct Symbol *s = newSymbol();
-        s->flag = F_ID;
+        s->flag = F_ID_PARAM;
         s->name = $2;
         s->type = $1;
         s->lineno = yylineno;
@@ -237,7 +240,7 @@ method_decl_params_list:
     }
     | type ID COMMA method_decl_params_list{
         struct Symbol *s = newSymbol();
-        s->flag = F_ID;
+        s->flag = F_ID_PARAM;
         s->name = $2;
         s->type = $1;
         s->lineno = yylineno;
@@ -365,6 +368,69 @@ statement:
     | block {
         $$ = $1;
     }
+    | ID '(' ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        if (r != NULL) {
+            GList *param;
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
+    | ID '(' ID ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        struct Symbol *t = findSymbol(stack, $3);
+        if ((r != NULL) && (t != NULL)) {
+            GList *param;
+            param = g_list_append(param, t);
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
+    | ID '(' ID COMMA ID ')' {
+        struct Symbol *r = findSymbol(stack, $1);
+        struct Symbol *t = findSymbol(stack, $3);
+        struct Symbol *u = findSymbol(stack, $5);
+        if ((r != NULL) && (t != NULL) && (u != NULL)) {
+            GList *param;
+            param = g_list_append(param, t);
+            param = g_list_append(param, u);
+            struct Symbol *s = newSymbol();
+            s->name = r->name;
+            s->type = r->type;
+            s->flag = F_FUNC_CALL;
+            s->param = param;
+            s->lineno = yylineno;
+            GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
+            $$ = parent;
+        }
+        else{
+            printf("tdsc> error in line %d: function '%s' not defined.\n", yylineno, $1);
+            exit(0);
+        }
+    }
   ;
 
 expression:
@@ -386,9 +452,10 @@ expression:
             s->name = r->name;
             s->type = r->type;
             s->flag = F_FUNC_CALL;
-            s->param = r->param;
+            s->param = param;
             s->lineno = yylineno;
             GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
             $$ = parent;
         }
         else{
@@ -398,16 +465,18 @@ expression:
     }
     | ID '(' ID ')' {
         struct Symbol *r = findSymbol(stack, $1);
-        if (r != NULL) {
+        struct Symbol *t = findSymbol(stack, $3);
+        if ((r != NULL) && (t != NULL)) {
             GList *param;
-            param = g_list_append(param, $3);
+            param = g_list_append(param, t);
             struct Symbol *s = newSymbol();
             s->name = r->name;
             s->type = r->type;
             s->flag = F_FUNC_CALL;
-            s->param = r->param;
+            s->param = param;
             s->lineno = yylineno;
             GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
             $$ = parent;
         }
         else{
@@ -417,17 +486,20 @@ expression:
     }
     | ID '(' ID COMMA ID ')' {
         struct Symbol *r = findSymbol(stack, $1);
-        if (r != NULL) {
+        struct Symbol *t = findSymbol(stack, $3);
+        struct Symbol *u = findSymbol(stack, $5);
+        if ((r != NULL) && (t != NULL) && (u != NULL)) {
             GList *param;
-            param = g_list_append(param, $3);
-            param = g_list_append(param, $5);
+            param = g_list_append(param, t);
+            param = g_list_append(param, u);
             struct Symbol *s = newSymbol();
             s->name = r->name;
             s->type = r->type;
             s->flag = F_FUNC_CALL;
-            s->param = r->param;
+            s->param = param;
             s->lineno = yylineno;
             GNode *parent = g_node_new(s);
+            g_node_append(parent, g_node_new(r));
             $$ = parent;
         }
         else{
