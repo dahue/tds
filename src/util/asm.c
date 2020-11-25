@@ -11,7 +11,7 @@ char *gen_header(GList *list, FILE *fp){
         GNode *node = g_list_nth_data(list, i);
         struct Symbol *s = node->data;
         if (s->flag == F_ID_GLOBAL) {
-            fprintf(fp, "%s:\t.long\t0\n", s->name);
+            fprintf(fp, "%s:\t.quad\t0\n", s->name);
         }
     }
 }
